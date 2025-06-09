@@ -1,129 +1,546 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
+import { BookOpen, Laptop, Briefcase, TrendingUp, Sun, Globe, Zap, Clock, Tag } from 'lucide-react'; // Icons for categories and details
 
-// --- Helper Components ---
+// Mock Data for Categories and Courses
+const categories = [
+  { id: 'engineering', name: 'القسم الهندسي', icon: BookOpen },
+  { id: 'technical', name: 'القسم التقني', icon: Laptop },
+  { id: 'professional', name: 'القسم المهني', icon: Briefcase },
+  { id: 'management', name: 'قسم الإدارة والقيادة', icon: TrendingUp },
+  { id: 'development', name: 'قسم التنمية البشرية', icon: Zap },
+  { id: 'languages', name: 'قسم اللغات', icon: Globe },
+  { id: 'summer_club', name: 'قسم النادي الصيفي', icon: Sun },
+];
 
-// The Header component with the menu button
-const Header = ({ onMenuToggle }) => {
-  return (
-    <header className="fixed top-0 right-0 left-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-md h-16 z-40 flex items-center justify-between px-4">
-      <h1 className="text-xl font-bold text-blue-700 dark:text-teal-400">المركز التعليمي</h1>
-      <button onClick={onMenuToggle} className="p-2 text-gray-800 dark:text-gray-200" aria-label="فتح القائمة">
-        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line>
-        </svg>
-      </button>
-    </header>
-  );
-};
+const courses = [
+  {
+    id: 'python_basics',
+    categoryId: 'technical',
+    name: 'أساسيات لغة بايثون Python',
+    shortDescription: 'من الصفر إلى بناء مشروعك الأول.',
+    price: 900,
+    originalPrice: 1200,
+    offerEndDate: '2025-06-30T23:59:59',
+    images: [
+      'https://placehold.co/600x400/D1FAE5/065F46?text=صورة+الدورة+1',
+      'https://placehold.co/600x400/E0F2FE/1D4ED8?text=صورة+الدورة+2',
+      'https://placehold.co/600x400/FEE2E2/B91C1C?text=صورة+الدورة+3',
+    ],
+    outline: [
+      'مقدمة في البرمجة والتعرف على بيئة العمل.',
+      'المتغيرات، أنواع البيانات، والعمليات الأساسية.',
+      'الجمل الشرطية والحلقات التكرارية.',
+      'الدوال والمكتبات الأساسية.',
+      'مشروع تطبيقي نهائي.',
+    ],
+    prerequisites: [
+      'لا يشترط وجود خبرة برمجية سابقة.',
+      'الإلمام بأساسيات استخدام الحاسوب.',
+      'شغف ورغبة حقيقية في التعلم.',
+    ],
+    duration: '40 ساعة تدريبية',
+    sessions: '16 جلسة',
+  },
+  {
+    id: 'cyber_security',
+    categoryId: 'technical',
+    name: 'الأمن السيبراني للمبتدئين',
+    shortDescription: 'ابدأ رحلتك في عالم حماية البيانات.',
+    price: 750,
+    originalPrice: 1000,
+    offerEndDate: '2025-07-15T23:59:59',
+    images: [
+      'https://placehold.co/600x400/D1FAE5/065F46?text=صورة+الأمن+السيبراني+1',
+      'https://placehold.co/600x400/E0F2FE/1D4ED8?text=صورة+الأمن+السيبراني+2',
+      'https://placehold.co/600x400/FEE2E2/B91C1C?text=صورة+الأمن+السيبراني+3',
+    ],
+    outline: [
+      'مقدمة في الأمن السيبراني والمخاطر الشائعة.',
+      'أساسيات حماية الشبكات والأنظمة.',
+      'التعامل مع البرمجيات الخبيثة.',
+      'أفضل ممارسات الأمن الشخصي والمهني.',
+    ],
+    prerequisites: [
+      'فهم أساسي لاستخدام الحاسوب والإنترنت.',
+      'رغبة في تعلم كيفية حماية المعلومات.',
+    ],
+    duration: '30 ساعة تدريبية',
+    sessions: '10 جلسات',
+  },
+  {
+    id: 'web_design',
+    categoryId: 'technical',
+    name: 'تصميم واجهات المستخدم (UI/UX)',
+    shortDescription: 'صمم تجارب مستخدم مذهلة وجذابة.',
+    price: 1100,
+    originalPrice: 1500,
+    offerEndDate: '2025-07-01T23:59:59',
+    images: [
+      'https://placehold.co/600x400/D1FAE5/065F46?text=صورة+UI/UX+1',
+      'https://placehold.co/600x400/E0F2FE/1D4ED8?text=صورة+UI/UX+2',
+      'https://placehold.co/600x400/FEE2E2/B91C1C?text=صورة+UI/UX+3',
+    ],
+    outline: [
+      'مبادئ تصميم واجهات المستخدم.',
+      'فهم تجربة المستخدم وأبحاثها.',
+      'أدوات التصميم (Figma, Sketch, Adobe XD).',
+      'بناء نماذج أولية وتجربتها.',
+      'مشروع تصميم واجهة كاملة.',
+    ],
+    prerequisites: [
+      'لا يشترط وجود خبرة سابقة في التصميم.',
+      'حس فني ورغبة في الإبداع.',
+    ],
+    duration: '50 ساعة تدريبية',
+    sessions: '20 جلسة',
+  },
+  {
+    id: 'excel_bi',
+    categoryId: 'technical',
+    name: 'تحليل البيانات باستخدام Excel و Power BI',
+    shortDescription: 'حول البيانات الخام إلى رؤى قيمة لاتخاذ القرار.',
+    price: 850,
+    originalPrice: 1100,
+    images: [
+      'https://placehold.co/600x400/D1FAE5/065F46?text=صورة+Excel+BI+1',
+      'https://placehold.co/600x400/E0F2FE/1D4ED8?text=صورة+Excel+BI+2',
+      'https://placehold.co/600x400/FEE2E2/B91C1C?text=صورة+Excel+BI+3',
+    ],
+    outline: [
+      'أساسيات Excel المتقدمة لتحليل البيانات.',
+      'مقدمة إلى Power BI وبناء لوحات المعلومات.',
+      'تحويل البيانات وتنظيفها (ETL).',
+      'إنشاء تقارير تفاعلية ومشاركتها.',
+      'دراسات حالة عملية في تحليل البيانات.',
+    ],
+    prerequisites: [
+      'إلمام بأساسيات برنامج Excel.',
+      'رغبة في تطوير مهارات تحليل البيانات.',
+    ],
+    duration: '35 ساعة تدريبية',
+    sessions: '14 جلسة',
+  },
+  {
+    id: 'summer_fun',
+    categoryId: 'summer_club',
+    name: 'نادي الصيف للمرح والإبداع',
+    shortDescription: 'أنشطة صيفية ممتعة وتنمية للمهارات.',
+    price: 500,
+    originalPrice: null, // No original price for summer club
+    offerEndDate: null,
+    images: [
+      'https://placehold.co/600x400/D1FAE5/065F46?text=صورة+النادي+الصيفي+1',
+      'https://placehold.co/600x400/E0F2FE/1D4ED8?text=صورة+النادي+الصيفي+2',
+      'https://placehold.co/600x400/FEE2E2/B91C1C?text=صورة+النادي+الصيفي+3',
+    ],
+    outline: [
+      'ورش عمل فنية وحرف يدوية.',
+      'ألعاب جماعية ورياضات خفيفة.',
+      'قصص تفاعلية وأنشطة ثقافية.',
+      'تحديات ذهنية وألعاب تعليمية.',
+    ],
+    prerequisites: [
+      'الفئة العمرية من 6-12 سنة.',
+      'حب الاستكشاف والمرح.',
+    ],
+    duration: '4 أسابيع',
+    sessions: 'يومياً (5 أيام في الأسبوع)',
+  },
+  {
+    id: 'english_conversation',
+    categoryId: 'languages',
+    name: 'محادثة اللغة الإنجليزية للمتقدمين',
+    shortDescription: 'تحدث الإنجليزية بطلاقة وثقة.',
+    price: 700,
+    originalPrice: 950,
+    offerEndDate: '2025-06-25T23:59:59',
+    images: [
+      'https://placehold.co/600x400/D1FAE5/065F46?text=صورة+اللغات+1',
+      'https://placehold.co/600x400/E0F2FE/1D4ED8?text=صورة+اللغات+2',
+      'https://placehold.co/600x400/FEE2E2/B91C1C?text=صورة+اللغات+3',
+    ],
+    outline: [
+      'نقاشات حول مواضيع متنوعة.',
+      'تحسين النطق واللكنة.',
+      'زيادة المفردات والتعبيرات.',
+      'جلسات لعب أدوار وتمارين عملية.',
+    ],
+    prerequisites: [
+      'مستوى متوسط إلى متقدم في اللغة الإنجليزية.',
+      'رغبة في الممارسة والتطوير المستمر.',
+    ],
+    duration: '25 ساعة تدريبية',
+    sessions: '10 جلسات',
+  },
+];
 
-// The Side Menu component
-const SideMenu = ({ isOpen, onClose, theme, setTheme }) => {
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
-    onClose(); // Close menu after selection
-  };
-  
-  if (!isOpen) return null;
-
-  return (
-    <>
-      {/* Overlay */}
-      <div onClick={onClose} className="fixed inset-0 bg-black/50 z-40 animate-fade-in" aria-hidden="true"></div>
-      
-      {/* Menu Panel */}
-      <aside 
-        className="fixed top-0 right-0 bottom-0 w-72 bg-white dark:bg-gray-800 shadow-2xl z-50 transition-transform duration-300 ease-in-out"
-        style={{ transform: isOpen ? 'translateX(0)' : 'translateX(100%)' }}
-      >
-        <div className="p-4">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white">الإعدادات</h2>
-            <button onClick={onClose} className="p-2 text-gray-600 dark:text-gray-400" aria-label="إغلاق القائمة">
-               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
-          </div>
-          <ul>
-            <li>
-              <button onClick={toggleTheme} className="w-full flex items-center gap-4 p-3 rounded-lg text-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                {theme === 'dark' ? 
-                  (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>) : 
-                  (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>)
-                }
-                <span>الوضع {theme === 'dark' ? 'النهاري' : 'الليلي'}</span>
-              </button>
-            </li>
-          </ul>
-        </div>
-      </aside>
-    </>
-  );
-};
-
-// --- Application Data & Icons ---
-// Corrected Icon definitions
-const TechIcon = (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>;
-const ManagementIcon = (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
-const LanguagesIcon = (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>;
-const SummerIcon = (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>;
-
-const educationalCenterData = { categories: [{ id: 'tech', name: 'القسم التقني', IconComponent: TechIcon, courses: [{ id: 'web-dev', name: 'تطوير تطبيقات الويب الشاملة', shortDescription: 'من الصفر إلى بناء مشروعك الأول', images: ['https://placehold.co/600x400/3B82F6/ffffff?text=قاعة+التدريب','https://placehold.co/600x400/10B981/ffffff?text=مشاريع+الطلاب','https://placehold.co/600x400/EF4444/ffffff?text=بيئة+العمل'], outline: ['مقدمة في HTML, CSS, و JavaScript','أساسيات React.js وبناء الواجهات التفاعلية','التعامل مع قواعد البيانات و بناء API','نشر التطبيقات على الإنترنت','مشروع تطبيقي نهائي'], prerequisites: ['لا يشترط وجود خبرة برمجية سابقة.','الإلمام بأساسيات استخدام الحاسوب.','شغف ورغبة حقيقية في التعلم.'], duration: '60 ساعة تدريبية', sessions: '20 جلسة', price: { original: 1500, discounted: 1125 }, offerEndDate: '2025-07-15' }, { id: 'python-basics', name: 'أساسيات لغة بايثون Python', shortDescription: 'انطلق في عالم البرمجة مع أقوى اللغات', images: ['https://placehold.co/600x400/F59E0B/ffffff?text=Python+Code'], outline: ['مقدمة في البرمجة وبيئة العمل.','المتغيرات، أنواع البيانات، والعمليات الأساسية.','الجمل الشرطية والحلقات التكرارية.','الدوال والمكتبات الأساسية.','مشروع تطبيقي نهائي.'], prerequisites: ['لا يتطلب أي خبرة مسبقة.'], duration: '40 ساعة تدريبية', sessions: '16 جلسة', price: { original: 1200, discounted: 900 }, offerEndDate: '2025-06-30' }, { id: 'ui-ux', name: 'تصميم واجهات المستخدم (UI/UX)', shortDescription: 'اصنع تجارب مستخدم مذهلة وسهلة', images: ['https://placehold.co/600x400/8B5CF6/ffffff?text=UI/UX+Design'], outline: ['مبادئ تجربة المستخدم (UX)','تصميم الواجهات (UI) باستخدام Figma','بناء النماذج الأولية (Prototypes)','اختبار قابلية الاستخدام'], prerequisites: ['حس فني ورغبة في التصميم.'], duration: '35 ساعة تدريبية', sessions: '14 جلسة', price: { original: 1100, discounted: 850 }, offerEndDate: '2025-07-20' },] }, { id: 'management', name: 'قسم الإدارة والقيادة', IconComponent: ManagementIcon, courses: [], }, { id: 'languages', name: 'قسم اللغات', IconComponent: LanguagesIcon, courses: [], }, { id: 'summer-club', name: 'قسم النادي الصيفي', IconComponent: SummerIcon, courses: [], },] };
-
-// --- Reusable Page/Screen Components ---
-const CourseDetails = ({ course, onBack }) => { const [currentImageIndex, setCurrentImageIndex] = useState(0); const nextImage = () => { setCurrentImageIndex((prev) => (prev + 1) % course.images.length); }; const prevImage = () => { setCurrentImageIndex((prev) => (prev - 1 + course.images.length) % course.images.length); }; const CountdownTimer = ({ endDate }) => { const calculateTimeLeft = () => { const diff = +new Date(endDate) - +new Date(); let timeLeft = {}; if (diff > 0) { timeLeft = { 'أيام': Math.floor(diff / (1000 * 60 * 60 * 24)), 'ساعات': Math.floor((diff / (1000 * 60 * 60)) % 24), 'دقائق': Math.floor((diff / 1000 / 60) % 60) }; } return timeLeft; }; const [timeLeft, setTimeLeft] = useState(calculateTimeLeft()); useEffect(() => { const timer = setTimeout(() => { setTimeLeft(calculateTimeLeft()); }, 1000); return () => clearTimeout(timer); }, [timeLeft]); const components = Object.keys(timeLeft).map((i) => <div key={i} className="text-center"><div className="text-xl md:text-2xl font-bold text-blue-500 dark:text-teal-400">{timeLeft[i]}</div><div className="text-xs text-gray-500 dark:text-gray-400">{i}</div></div>); return components.length ? <div className="flex justify-center gap-4">{components}</div> : <span className="text-red-500 font-semibold">انتهى العرض!</span>; }; const handleWhatsAppInquiry = () => { const phone = '966000000000'; const msg = `مرحباً، أرغب بالاستفسار عن دورة "${course.name}". هل يمكنني الحصول على المزيد من التفاصيل؟`; window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank'); }; return ( <div className="w-full max-w-4xl mx-auto p-4 md:p-6 bg-white dark:bg-gray-800 rounded-lg animate-fade-in shadow-lg"><button onClick={onBack} className="mb-4 flex items-center gap-2 text-blue-600 dark:text-teal-400 hover:text-blue-800 dark:hover:text-teal-300 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>العودة لقائمة الدورات</button><h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 text-center">{course.name}</h1><div className="relative w-full max-w-2xl mx-auto mb-6 rounded-lg overflow-hidden shadow-lg"><img src={course.images[currentImageIndex]} alt={`صورة عرض ${currentImageIndex + 1}`} className="w-full h-56 md:h-72 object-cover transition-transform duration-500 ease-in-out" />{course.images.length > 1 && (<><button onClick={prevImage} className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-opacity"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button><button onClick={nextImage} className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-opacity"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg></button></>)}</div><div className="space-y-6"><div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg"><h2 className="text-2xl font-semibold text-blue-700 dark:text-teal-400 mb-3">ماذا ستتعلم في هذه الدورة؟</h2><ul className="space-y-2 pr-5 text-gray-700 dark:text-gray-300 list-disc list-inside">{course.outline.map((item, i) => <li key={i}>{item}</li>)}</ul></div><div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg"><h2 className="text-2xl font-semibold text-blue-700 dark:text-teal-400 mb-3">لمن هذه الدورة؟</h2><ul className="space-y-2 pr-5 text-gray-700 dark:text-gray-300 list-disc list-inside">{course.prerequisites.map((item, i) => <li key={i}>{item}</li>)}</ul></div><div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg text-center flex justify-around items-center"><div><p className="text-lg font-semibold text-gray-800 dark:text-white">المدة الإجمالية</p><p className="text-xl text-blue-600 dark:text-teal-400">{course.duration}</p></div><div className="border-l-2 border-gray-200 dark:border-gray-600 h-12"></div><div><p className="text-lg font-semibold text-gray-800 dark:text-white">عدد الجلسات</p><p className="text-xl text-blue-600 dark:text-teal-400">{course.sessions}</p></div></div><div className="bg-blue-100 dark:bg-gradient-to-l from-teal-500 to-cyan-600 p-5 rounded-lg text-center shadow-lg"><h2 className="text-2xl font-bold text-blue-800 dark:text-white mb-2">عرض خاص للتسجيل المبكر!</h2><div className="flex justify-center items-center gap-4 my-3"><span className="line-through text-gray-500 dark:text-gray-200 text-xl">{course.price.original} ريال</span><span className="text-3xl font-extrabold text-blue-600 dark:text-yellow-300 animate-pulse">{course.price.discounted} ريال فقط!</span></div><div className="mt-4 bg-white/50 dark:bg-gray-800/50 p-3 rounded-lg"><p className="mb-2 text-gray-700 dark:text-gray-200">ينتهي العرض خلال:</p><CountdownTimer endDate={course.offerEndDate} /></div></div><div className="mt-8"><button onClick={handleWhatsAppInquiry} className="w-full flex items-center justify-center gap-3 bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-6 rounded-lg text-xl transition-transform transform hover:scale-105 shadow-lg"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99 0-3.903-.52-5.586-1.456l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.451-4.437-9.887-9.888-9.888-5.452 0-9.888 4.436-9.889 9.888.001 2.228.651 4.315 1.731 6.086l.001.004l-1.043 3.803 3.827-1.011z"/></svg>سجل الآن عبر الواتساب</button></div></div></div> ); };
-const CoursesList = ({ category, onSelectCourse, onBack }) => { return ( <div className="w-full max-w-4xl mx-auto p-4 md:p-6 bg-white dark:bg-gray-800 rounded-lg animate-fade-in shadow-lg"><button onClick={onBack} className="mb-4 flex items-center gap-2 text-blue-600 dark:text-teal-400 hover:text-blue-800 dark:hover:text-teal-300 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>العودة للأقسام</button><h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6 text-center">دورات {category.name}</h1>{category.courses.length > 0 ? ( <div className="space-y-4">{category.courses.map((course) => ( <div key={course.id} onClick={() => onSelectCourse(course.id)} className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg flex justify-between items-center cursor-pointer hover:bg-blue-100 dark:hover:bg-gray-600 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"><div><h2 className="text-xl font-semibold text-blue-700 dark:text-teal-400">{course.name}</h2><p className="text-gray-600 dark:text-gray-400">{course.shortDescription}</p></div><svg className="text-gray-400 dark:text-gray-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg></div> ))}</div> ) : ( <p className="text-center text-gray-500 dark:text-gray-400 mt-8 text-lg">لا توجد دورات في هذا القسم حالياً. ترقبوا جديدنا!</p> )}</div> ); };
-const HomeScreen = ({ onSelectCategory }) => { return ( <div className="w-full max-w-5xl mx-auto p-4 md:p-6 bg-white dark:bg-gray-800 rounded-lg animate-fade-in shadow-lg"><h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2 text-center">أقسامنا التدريبية</h1><p className="text-center text-gray-600 dark:text-gray-400 mb-8">اختر اهتمامك وانطلق في رحلة التعلم</p><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">{educationalCenterData.categories.map((category) => { const { IconComponent } = category; return ( <div key={category.id} onClick={() => onSelectCategory(category.id)} className="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg text-center cursor-pointer flex flex-col items-center justify-center gap-4 hover:bg-blue-500/10 dark:hover:bg-teal-500/20 hover:shadow-xl hover:border-blue-500 dark:hover:border-teal-500 border-2 border-transparent transition-all duration-300 transform hover:-translate-y-2"><div className="text-blue-600 dark:text-teal-400"><IconComponent className="w-12 h-12" /></div><h2 className="text-xl font-semibold text-gray-800 dark:text-white">{category.name}</h2></div> ); })}</div></div> ); };
-
-
-// --- Main Application Component ---
-export default function App() {
-  const [page, setPage] = useState('home');
+// Main App Component
+function App() {
+  // State to manage current screen and selected items
+  const [currentScreen, setCurrentScreen] = useState('home'); // 'home', 'courseList', 'courseDetails'
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const [selectedCourseId, setSelectedCourseId] = useState(null);
-  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [installPrompt, setInstallPrompt] = useState(null);
 
-  useEffect(() => {
-    const root = window.document.documentElement;
-    root.classList.remove('light', 'dark');
-    root.classList.add(theme);
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-  
-  useEffect(() => {
-    const handler = (e) => { e.preventDefault(); setInstallPrompt(e); };
-    window.addEventListener('beforeinstallprompt', handler);
-    return () => window.removeEventListener('beforeinstallprompt', handler);
-  }, []);
+  // --- Home Screen Component ---
+  const HomeScreen = ({ onSelectCategory }) => {
+    return (
+      <div className="p-6 md:p-8 bg-gray-50 min-h-screen font-inter text-right flex flex-col items-center">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 mb-8 mt-4 text-center">
+          أقسامنا التدريبية
+        </h1>
+        <p className="text-lg md:text-xl text-gray-600 mb-10 text-center max-w-2xl">
+          اختر اهتمامك وانطلق في رحلتك التعليمية معنا!
+        </p>
 
-  const handleInstallClick = () => { if (installPrompt) { installPrompt.prompt(); } };
-  const goToHome = () => { setPage('home'); setSelectedCategoryId(null); setSelectedCourseId(null); };
-  const handleSelectCategory = (categoryId) => { setSelectedCategoryId(categoryId); setPage('courses'); };
-  const handleSelectCourse = (courseId) => { setSelectedCourseId(courseId); setPage('details'); };
-  const handleBackToCourses = () => { setPage('courses'); setSelectedCourseId(null); };
-  
-  const selectedCategory = useMemo(() => educationalCenterData.categories.find(c => c.id === selectedCategoryId), [selectedCategoryId] );
-  const selectedCourse = useMemo(() => selectedCategory?.courses.find(c => c.id === selectedCourseId), [selectedCategory, selectedCourseId] );
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-4xl">
+          {categories.map((category) => (
+            <div
+              key={category.id}
+              onClick={() => onSelectCategory(category.id)}
+              className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer flex flex-col items-center text-center border border-gray-200"
+            >
+              <div className="p-4 bg-indigo-100 rounded-full mb-4">
+                <category.icon className="w-10 h-10 text-indigo-700" />
+              </div>
+              <h2 className="text-xl font-semibold text-gray-900">{category.name}</h2>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
+  // --- Course List Screen Component ---
+  const CourseListScreen = ({ categoryId, onSelectCourse, onBack }) => {
+    const category = categories.find((cat) => cat.id === categoryId);
+    const filteredCourses = courses.filter((course) => course.categoryId === categoryId);
+
+    if (!category) {
+      return <div className="p-6 text-center text-red-500">حدث خطأ: القسم غير موجود.</div>;
+    }
+
+    return (
+      <div className="p-6 md:p-8 bg-gray-50 min-h-screen font-inter text-right flex flex-col items-center">
+        <div className="w-full max-w-4xl flex items-center mb-6">
+          <button
+            onClick={onBack}
+            className="p-2 mr-4 bg-indigo-500 text-white rounded-full shadow-md hover:bg-indigo-600 transition-colors"
+            aria-label="العودة"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="w-6 h-6 transform rotate-180" // Rotate for RTL back arrow
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+          </button>
+          <h1 className="text-3xl md:text-4xl font-extrabold text-gray-800 flex-grow text-center ml-16">
+            دورات {category.name}
+          </h1>
+        </div>
+
+        {filteredCourses.length === 0 ? (
+          <p className="text-lg text-gray-600 mt-10">لا توجد دورات متاحة في هذا القسم حاليًا.</p>
+        ) : (
+          <div className="w-full max-w-4xl space-y-4">
+            {filteredCourses.map((course) => (
+              <div
+                key={course.id}
+                onClick={() => onSelectCourse(course.id)}
+                className="bg-white p-5 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer border border-gray-200 flex flex-col md:flex-row items-start md:items-center justify-between"
+              >
+                <div className="flex-1 mb-3 md:mb-0">
+                  <h2 className="text-xl font-bold text-gray-900">{course.name}</h2>
+                  <p className="text-gray-600 mt-1">{course.shortDescription}</p>
+                </div>
+                {course.price && (
+                  <div className="flex items-center text-lg font-semibold text-indigo-600">
+                    {course.offerEndDate && new Date(course.offerEndDate) > new Date() && course.originalPrice ? (
+                      <span className="text-gray-500 line-through ml-2">{course.originalPrice} ريال</span>
+                    ) : null}
+                    <span>{course.price} ريال</span>
+                    {course.offerEndDate && new Date(course.offerEndDate) > new Date() && (
+                      <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full mr-2">عرض خاص</span>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // --- Course Detail Screen Component ---
+  const CourseDetailScreen = ({ courseId, onBack }) => {
+    const course = courses.find((c) => c.id === courseId);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [timeLeft, setTimeLeft] = useState(null);
+
+    useEffect(() => {
+      if (course?.offerEndDate) {
+        const calculateTimeLeft = () => {
+          const difference = +new Date(course.offerEndDate) - +new Date();
+          let timeLeft = {};
+
+          if (difference > 0) {
+            timeLeft = {
+              days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+              hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+              minutes: Math.floor((difference / 1000 / 60) % 60),
+              seconds: Math.floor((difference / 1000) % 60),
+            };
+          }
+          return timeLeft;
+        };
+
+        setTimeLeft(calculateTimeLeft());
+        const timer = setInterval(() => {
+          setTimeLeft(calculateTimeLeft());
+        }, 1000);
+        return () => clearInterval(timer);
+      }
+    }, [course]);
+
+    if (!course) {
+      return <div className="p-6 text-center text-red-500">حدث خطأ: الدورة غير موجودة.</div>;
+    }
+
+    const nextImage = () => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % course.images.length);
+    };
+
+    const prevImage = () => {
+      setCurrentImageIndex((prevIndex) => (prevIndex - 1 + course.images.length) % course.images.length);
+    };
+
+    const whatsappMessage = encodeURIComponent(
+      `مرحباً، أرغب بالاستفسار عن (${course.name}). هل يمكنني الحصول على المزيد من التفاصيل؟`
+    );
+    // Replace with your actual WhatsApp number
+    const whatsappLink = `https://wa.me/966500000000?text=${whatsappMessage}`;
+
+    const timerComponents = [];
+    if (timeLeft) {
+      Object.keys(timeLeft).forEach((interval) => {
+        if (!timeLeft[interval] && interval !== 'seconds' && interval !== 'minutes') {
+          return;
+        }
+        timerComponents.push(
+          <span key={interval} className="mx-1 p-2 bg-indigo-100 rounded-lg text-indigo-800 font-bold">
+            {timeLeft[interval]} {
+              interval === 'days' ? 'أيام' :
+              interval === 'hours' ? 'ساعات' :
+              interval === 'minutes' ? 'دقائق' :
+              'ثواني'
+            }
+          </span>
+        );
+      });
+    }
+
+    return (
+      <div className="p-6 md:p-8 bg-gray-50 min-h-screen font-inter text-right flex flex-col items-center">
+        <div className="w-full max-w-4xl flex items-center mb-6">
+          <button
+            onClick={onBack}
+            className="p-2 mr-4 bg-indigo-500 text-white rounded-full shadow-md hover:bg-indigo-600 transition-colors"
+            aria-label="العودة"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="w-6 h-6 transform rotate-180" // Rotate for RTL back arrow
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+          </button>
+          <h1 className="text-3xl md:text-4xl font-extrabold text-gray-800 flex-grow text-center ml-16">
+            {course.name}
+          </h1>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 w-full max-w-4xl border border-gray-200">
+          {/* Image Carousel */}
+          {course.images && course.images.length > 0 && (
+            <div className="relative w-full h-64 md:h-80 rounded-xl overflow-hidden mb-8 shadow-md">
+              <img
+                src={course.images[currentImageIndex]}
+                alt={`صورة الدورة ${currentImageIndex + 1}`}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = 'https://placehold.co/600x400/cccccc/ffffff?text=صورة+غير+متوفرة';
+                }}
+              />
+              {course.images.length > 1 && (
+                <>
+                  <button
+                    onClick={prevImage}
+                    className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full focus:outline-none hover:bg-opacity-75 transition-colors"
+                    aria-label="الصورة السابقة"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2}
+                      stroke="currentColor"
+                      className="w-6 h-6 transform rotate-180"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={nextImage}
+                    className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full focus:outline-none hover:bg-opacity-75 transition-colors"
+                    aria-label="الصورة التالية"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2}
+                      stroke="currentColor"
+                      className="w-6 h-6"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Course Outline */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+              <BookOpen className="ml-2 text-indigo-600" /> ماذا ستتعلم في هذه الدورة؟
+            </h2>
+            <ul className="list-none space-y-3">
+              {course.outline.map((item, index) => (
+                <li key={index} className="text-gray-700 text-lg flex items-start">
+                  <span className="text-indigo-600 font-extrabold text-2xl leading-none ml-2">•</span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Prerequisites */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+              <Laptop className="ml-2 text-indigo-600" /> لمن هذه الدورة؟ / متطلبات الدورة
+            </h2>
+            <ul className="list-none space-y-3">
+              {course.prerequisites.map((item, index) => (
+                <li key={index} className="text-gray-700 text-lg flex items-start">
+                  <span className="text-indigo-600 font-extrabold text-2xl leading-none ml-2">•</span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Duration Details */}
+          <div className="bg-indigo-50 p-6 rounded-2xl shadow-inner mb-8 flex flex-col sm:flex-row justify-around items-center text-center sm:text-right border border-indigo-200">
+            <div className="flex items-center mb-4 sm:mb-0">
+              <Clock className="ml-3 text-indigo-700 w-8 h-8" />
+              <div>
+                <p className="text-gray-600">المدة الإجمالية:</p>
+                <p className="text-xl font-bold text-indigo-800">{course.duration}</p>
+              </div>
+            </div>
+            <div className="flex items-center">
+              <Tag className="ml-3 text-indigo-700 w-8 h-8" />
+              <div>
+                <p className="text-gray-600">عدد الجلسات:</p>
+                <p className="text-xl font-bold text-indigo-800">{course.sessions}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Discounts & Offers */}
+          {course.offerEndDate && new Date(course.offerEndDate) > new Date() && (
+            <div className="bg-red-50 p-6 rounded-2xl shadow-inner mb-8 text-center border border-red-200">
+              <h2 className="text-2xl font-bold text-red-700 mb-3 flex items-center justify-center">
+                <span className="text-3xl ml-2">🎉</span> عرض خاص!
+              </h2>
+              <p className="text-red-800 text-xl font-semibold mb-2">خصم 25% للتسجيل المبكر.</p>
+              <p className="text-gray-700 text-lg mb-3">
+                السعر الأصلي: <span className="line-through">{course.originalPrice} ريال</span>
+              </p>
+              <p className="text-red-900 text-3xl font-extrabold mb-4">
+                السعر الآن: {course.price} ريال فقط!
+              </p>
+              <p className="text-red-600 text-lg">
+                ينتهي العرض بتاريخ: {new Date(course.offerEndDate).toLocaleDateString('ar-EG')}
+              </p>
+              {timerComponents.length > 0 && (
+                <div className="mt-4 flex flex-wrap justify-center items-center gap-2">
+                  <span className="text-red-700 text-xl">تبقى:</span>
+                  {timerComponents}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Call to Action Button */}
+          <a
+            href={whatsappLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full flex items-center justify-center bg-green-500 text-white py-4 rounded-xl text-2xl font-bold shadow-lg hover:bg-green-600 transition-colors transform hover:scale-105"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="w-8 h-8 ml-3"
+            >
+              <path d="M12.0001 2C6.47715 2 2.0001 6.47715 2.0001 12C2.0001 14.159 2.68594 16.2081 3.90098 17.9229L2.0001 22.0001L6.23071 20.0768C7.94057 21.0374 9.92383 21.5001 12.0001 21.5001C17.523 21.5001 22.0001 17.023 22.0001 12C22.0001 6.47715 17.523 2 12.0001 2ZM16.5001 15.5C16.3334 15.6667 16.1667 15.75 15.9167 15.75C15.6667 15.75 15.4167 15.6667 15.2501 15.5L14.0001 14.1667C13.8334 14 13.6667 13.9167 13.4167 13.9167C13.1667 13.9167 12.9167 14 12.7501 14.1667L10.7501 16.1667C10.5834 16.3334 10.3334 16.4167 10.0834 16.4167C9.83344 16.4167 9.58344 16.3334 9.41677 16.1667L8.16677 14.9167C8.0001 14.75 7.91677 14.5 7.91677 14.25C7.91677 14 8.0001 13.75 8.16677 13.5834L9.08344 12.6667C9.2501 12.5 9.33344 12.25 9.33344 12C9.33344 11.75 9.2501 11.5 9.08344 11.3334L8.16677 10.4167C8.0001 10.25 7.91677 10 7.91677 9.75C7.91677 9.5 8.0001 9.25 8.16677 9.08344L9.41677 7.83344C9.58344 7.66677 9.83344 7.58344 10.0834 7.58344C10.3334 7.58344 10.5834 7.66677 10.7501 7.83344L12.7501 9.83344C12.9167 10 13.1667 10.0834 13.4167 10.0834C13.6667 10.0834 13.8334 10 14.0001 9.83344L15.2501 8.58344C15.4167 8.41677 15.6667 8.33344 15.9167 8.33344C16.1667 8.33344 16.3334 8.41677 16.5001 8.58344L17.4167 9.5001C17.5834 9.66677 17.6667 9.91677 17.6667 10.1667C17.6667 10.4167 17.5834 10.6667 17.4167 10.8334L16.5001 11.75C16.3334 11.9167 16.2501 12.1667 16.2501 12.4167C16.2501 12.6667 16.3334 12.9167 16.5001 13.0834L17.4167 14C17.5834 14.1667 17.6667 14.4167 17.6667 14.6667C17.6667 14.9167 17.5834 15.1667 17.4167 15.3334L16.5001 15.5Z" />
+            </svg>
+            سجل الآن عبر الواتساب
+          </a>
+        </div>
+      </div>
+    );
+  };
+
+  // Main App rendering logic based on currentScreen state
   return (
-    <div className="bg-gray-100 dark:bg-gray-900 min-h-screen text-gray-800 dark:text-white font-['Cairo',_sans-serif] transition-colors duration-500">
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap'); .animate-fade-in { animation: fadeIn 0.5s ease-in-out; } @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }`}</style>
-      
-      <Header onMenuToggle={() => setIsMenuOpen(true)} />
-      <SideMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} theme={theme} setTheme={setTheme} />
-      
-      <main className="pt-20 p-4 flex items-center justify-center min-h-screen">
-        {page === 'home' && <HomeScreen onSelectCategory={handleSelectCategory} />}
-        {page === 'courses' && selectedCategory && ( <CoursesList category={selectedCategory} onSelectCourse={handleSelectCourse} onBack={goToHome} /> )}
-        {page === 'details' && selectedCourse && ( <CourseDetails course={selectedCourse} onBack={handleBackToCourses} /> )}
-      </main>
-
-      {installPrompt && (
-        <button onClick={handleInstallClick} className="fixed bottom-4 right-4 bg-blue-600 dark:bg-teal-500 hover:bg-blue-700 dark:hover:bg-teal-600 text-white font-bold py-3 px-5 rounded-full shadow-lg z-30 flex items-center gap-3 animate-pulse transition-transform transform hover:scale-110" title="تثبيت التطبيق على جهازك">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
-          <span>تثبيت</span>
-        </button>
+    <div className="App text-right">
+      <style>{`
+        /* Import Google Font - Inter */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        body {
+          font-family: 'Inter', sans-serif;
+          direction: rtl; /* Set overall text direction to right-to-left */
+        }
+      `}</style>
+      {currentScreen === 'home' && (
+        <HomeScreen onSelectCategory={(id) => { setSelectedCategoryId(id); setCurrentScreen('courseList'); }} />
+      )}
+      {currentScreen === 'courseList' && (
+        <CourseListScreen
+          categoryId={selectedCategoryId}
+          onSelectCourse={(id) => { setSelectedCourseId(id); setCurrentScreen('courseDetails'); }}
+          onBack={() => setCurrentScreen('home')}
+        />
+      )}
+      {currentScreen === 'courseDetails' && (
+        <CourseDetailScreen courseId={selectedCourseId} onBack={() => setCurrentScreen('courseList')} />
       )}
     </div>
   );
 }
+
+export default App;
