@@ -36,14 +36,15 @@
     <script type="module">
         // --- State Management ---
         const state = {
-            page: 'home',
+            page: 'home', // 'home', 'courses', 'details'
             selectedCategoryId: null,
             selectedCourseId: null,
             theme: localStorage.getItem('theme') || 'light',
             isMenuOpen: false,
+            currentImageIndex: 0,
         };
 
-        // --- Data with new Icons and Sections ---
+        // --- Data ---
         const ProgrammingIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>`;
         const TechIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"></rect><line x1="7" y1="20" x2="17" y2="20"></line><line x1="12" y1="4" x2="12" y2="2"></line><circle cx="8.5" cy="10" r=".5" fill="currentColor"></circle><circle cx="15.5" cy="10" r=".5" fill="currentColor"></circle><path d="M9 14h6"></path></svg>`;
         const ProfessionalIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>`;
@@ -53,12 +54,48 @@
         
         const educationalCenterData = { 
             categories: [
-                { id: 'programming', name: 'القسم البرمجي', icon: ProgrammingIcon, courses: [{ id: 'web-dev', name: 'تطوير تطبيقات الويب الشاملة', shortDescription: 'من الصفر إلى بناء مشروعك الأول', images: ['https://placehold.co/600x400/3B82F6/ffffff?text=قاعة+التدريب','https://placehold.co/600x400/10B981/ffffff?text=مشاريع+الطلاب'], outline: ['مقدمة في HTML, CSS, و JavaScript','أساسيات React.js','بناء API','مشروع تطبيقي نهائي'], prerequisites: ['لا يشترط وجود خبرة برمجية سابقة.','الإلمام بأساسيات استخدام الحاسوب.'], duration: '60 ساعة', sessions: '20 جلسة', price: { original: 1500, discounted: 1125 }, offerEndDate: '2025-07-15' }] },
-                { id: 'tech', name: 'القسم التقني', icon: TechIcon, courses: [] },
-                { id: 'professional', name: 'القسم المهني', icon: ProfessionalIcon, courses: [] },
-                { id: 'management', name: 'قسم الإدارة والقيادة', icon: ManagementIcon, courses: [] },
-                { id: 'languages', name: 'قسم اللغات', icon: LanguagesIcon, courses: [] },
-                { id: 'summer-club', name: 'النادي الصيفي', icon: SummerIcon, courses: [] }
+                { id: 'programming', name: 'القسم البرمجي', icon: ProgrammingIcon, courses: [
+                    { id: 'web-dev', name: 'تطوير الويب الشامل (Full-Stack)', shortDescription: 'من الصفر إلى بناء مشروعك الأول', images: ['https://placehold.co/600x400/3B82F6/ffffff?text=Full-Stack'], outline: ['مقدمة في HTML, CSS, & JavaScript','أساسيات React.js','بناء API احترافية بـ Node.js','مشروع تطبيقي نهائي'], prerequisites: ['لا يشترط وجود خبرة برمجية سابقة.'], duration: '60 ساعة', sessions: '20 جلسة', price: { original: 2000000, discounted: 1500000 }, offerEndDate: '2025-07-15' },
+                    { id: 'python-ds', name: 'بايثون لتحليل البيانات', shortDescription: 'استخرج كنوز البيانات مع بايثون', images: ['https://placehold.co/600x400/F59E0B/ffffff?text=Python'], outline: ['أساسيات بايثون','مكتبات Pandas و NumPy','تصور البيانات بـ Matplotlib','مشروع عملي'], prerequisites: ['أساسيات البرمجة مرغوبة.'], duration: '50 ساعة', sessions: '18 جلسة', price: { original: 1800000, discounted: 1400000 }, offerEndDate: '2025-07-20' },
+                    { id: 'android-kotlin', name: 'تطوير تطبيقات أندرويد', shortDescription: 'اصنع تطبيقك الأول على متجر جوجل', images: ['https://placehold.co/600x400/10B981/ffffff?text=Android'], outline: ['مقدمة في لغة Kotlin','بناء واجهات المستخدم XML','التعامل مع قواعد البيانات المحلية','نشر التطبيق'], prerequisites: ['معرفة بأساسيات البرمجة.'], duration: '70 ساعة', sessions: '25 جلسة', price: { original: 2500000, discounted: 2000000 }, offerEndDate: '2025-08-01' },
+                    { id: 'ios-swift', name: 'تطوير تطبيقات آيفون', shortDescription: 'برمج تطبيقات احترافية للآيفون والآيباد', images: ['https://placehold.co/600x400/4F46E5/ffffff?text=iOS'], outline: ['أساسيات لغة Swift','بناء الواجهات بـ SwiftUI','دورة حياة التطبيق','الاتصال بالإنترنت'], prerequisites: ['يفضل وجود جهاز ماك.'], duration: '70 ساعة', sessions: '25 جلسة', price: { original: 2800000, discounted: 2200000 }, offerEndDate: '2025-08-05' },
+                    { id: 'game-unity', name: 'تطوير الألعاب بـ Unity', shortDescription: 'حوّل فكرتك إلى لعبة ممتعة', images: ['https://placehold.co/600x400/EF4444/ffffff?text=Unity'], outline: ['مقدمة في محرك Unity','أساسيات لغة C#','فيزياء الألعاب والتحريك','بناء لعبة 2D بسيطة'], prerequisites: ['شغف بالألعاب ورغبة بالتعلم.'], duration: '60 ساعة', sessions: '20 جلسة', price: { original: 2200000, discounted: 1800000 }, offerEndDate: '2025-07-25' }
+                ]},
+                { id: 'tech', name: 'القسم التقني', icon: TechIcon, courses: [
+                    { id: 'arduino-basics', name: 'أساسيات الأردوينو والإلكترونيات', shortDescription: 'تحكم في العالم من حولك', images: ['https://placehold.co/600x400/0ea5e9/ffffff?text=Arduino'], outline: ['مقدمة في الدوائر الكهربائية','برمجة متحكمات الأردوينو','التعامل مع الحساسات والمحركات','مشروع إنارة ذكية'], prerequisites: ['لا يتطلب خبرة مسبقة.'], duration: '40 ساعة', sessions: '15 جلسة', price: { original: 1500000, discounted: 1200000 }, offerEndDate: '2025-08-10' },
+                    { id: 'robotics-auto', name: 'الروبوتات والأتمتة الصناعية', shortDescription: 'اصنع ذراعك الروبوتية الأولى', images: ['https://placehold.co/600x400/6366f1/ffffff?text=Robotics'], outline: ['أنواع الروبوتات الصناعية','المتحكمات المنطقية القابلة للبرمجة PLC','تصميم وبناء روبوت بسيط','برمجة المهام التكرارية'], prerequisites: ['أساسيات الإلكترونيات.'], duration: '60 ساعة', sessions: '20 جلسة', price: { original: 2400000, discounted: 1900000 }, offerEndDate: '2025-08-15' },
+                    { id: '3d-printing', name: 'الطباعة ثلاثية الأبعاد والتصميم', shortDescription: 'حوّل تصاميمك الرقمية إلى واقع', images: ['https://placehold.co/600x400/d946ef/ffffff?text=3D+Print'], outline: ['مقدمة في تقنيات الطباعة 3D','التصميم باستخدام TinkerCAD','إعداد الطابعة والملفات','طباعة نماذج عملية'], prerequisites: ['لا يتطلب خبرة مسبقة.'], duration: '30 ساعة', sessions: '10 جلسات', price: { original: 1200000, discounted: 950000 }, offerEndDate: '2025-07-30' },
+                    { id: 'mobile-maintenance', name: 'صيانة الجوالات (هاردوير)', shortDescription: 'تعلم أسرار صيانة الهواتف الذكية', images: ['https://placehold.co/600x400/84cc16/ffffff?text=Maintenance'], outline: ['مكونات الجوال الداخلية','تشخيص الأعطال الشائعة','فك وتركيب الشاشات والبطاريات','أساسيات اللحام'], prerequisites: ['دقة وصبر.'], duration: '50 ساعة', sessions: '18 جلسة', price: { original: 1700000, discounted: 1300000 }, offerEndDate: '2025-08-20' },
+                    { id: 'electrical-basics', name: 'أساسيات الشبكات الكهربائية', shortDescription: 'فهم وتصميم التمديدات المنزلية', images: ['https://placehold.co/600x400/f97316/ffffff?text=Electrical'], outline: ['مبادئ التيار المتردد والمستمر','الأحمال الكهربائية والقواطع','تصميم مخططات كهربائية','أساسيات الأمان الكهربائي'], prerequisites: ['لا يتطلب خبرة مسبقة.'], duration: '35 ساعة', sessions: '12 جلسة', price: { original: 1300000, discounted: 1000000 }, offerEndDate: '2025-08-25' }
+                ]},
+                { id: 'professional', name: 'القسم المهني', icon: ProfessionalIcon, courses: [
+                    { id: 'graphic-design', name: 'التصميم الجرافيكي الاحترافي', shortDescription: 'تعلم فوتوشوب، إليستريتور، وإنديزاين', images: ['https://placehold.co/600x400/ec4899/ffffff?text=Design'], outline: ['أساسيات التصميم والألوان','تصميم الشعارات والهويات البصرية','تعديل الصور الاحترافي','تصميم المطبوعات'], prerequisites: ['حس فني أساسي.'], duration: '50 ساعة', sessions: '18 جلسة', price: { original: 1600000, discounted: 1250000 }, offerEndDate: '2025-09-01' },
+                    { id: 'ms-office', name: 'مايكروسوفت أوفيس المتقدم', shortDescription: 'أتقن وورد، إكسل، وباوربوينت', images: ['https://placehold.co/600x400/14b8a6/ffffff?text=Office'], outline: ['الجداول المحورية في إكسل','تصميم العروض التقديمية الاحترافية','تنسيق المستندات الطويلة في وورد','دمج المراسلات'], prerequisites: ['أساسيات استخدام الحاسب.'], duration: '30 ساعة', sessions: '10 جلسة', price: { original: 900000, discounted: 700000 }, offerEndDate: '2025-08-15' },
+                    { id: 'digital-marketing', name: 'التسويق الرقمي الشامل', shortDescription: 'كن خبير تسويق على الإنترنت', images: ['https://placehold.co/600x400/f59e0b/ffffff?text=Marketing'], outline: ['تحسين محركات البحث (SEO)','إدارة حملات جوجل وفيسبوك','التسويق عبر البريد الإلكتروني','تحليل البيانات التسويقية'], prerequisites: ['لا يتطلب خبرة مسبقة.'], duration: '45 ساعة', sessions: '15 جلسة', price: { original: 1500000, discounted: 1100000 }, offerEndDate: '2025-08-20' },
+                    { id: 'video-editing', name: 'المونتاج وتحرير الفيديو', shortDescription: 'اصنع فيديوهات احترافية بـ Adobe Premiere', images: ['https://placehold.co/600x400/8b5cf6/ffffff?text=Video'], outline: ['أساسيات المونتاج والقص','إضافة المؤثرات والانتقالات','تصحيح الألوان والصوت','إخراج الفيديو للمنصات المختلفة'], prerequisites: ['لا يتطلب خبرة مسبقة.'], duration: '40 ساعة', sessions: '14 جلسة', price: { original: 1400000, discounted: 1150000 }, offerEndDate: '2025-09-05' },
+                    { id: 'photography', name: 'أساسيات التصوير الفوتوغرافي', shortDescription: 'التقط صوراً مذهلة بكاميرتك', images: ['https://placehold.co/600x400/6b7280/ffffff?text=Camera'], outline: ['مثلث التعريض (فتحة العدسة، السرعة، الآيزو)','قواعد التكوين الفني','التعامل مع الإضاءة الطبيعية','تعديل الصور بـ Lightroom'], prerequisites: ['كاميرا احترافية أو شبه احترافية.'], duration: '25 ساعة', sessions: '8 جلسات', price: { original: 1000000, discounted: 800000 }, offerEndDate: '2025-08-28' }
+                ]},
+                { id: 'management', name: 'قسم الإدارة والقيادة', icon: ManagementIcon, courses: [
+                    { id: 'pmp', name: 'إدارة المشاريع الاحترافية (PMP)', shortDescription: 'تأهل للحصول على شهادة PMP العالمية', images: ['https://placehold.co/600x400/06b6d4/ffffff?text=PMP'], outline: [], prerequisites: [], duration: '40 ساعة', sessions: '15 جلسة', price: { original: 1800000, discounted: 1500000 }, offerEndDate: '2025-09-10' },
+                    { id: 'hr', name: 'إدارة الموارد البشرية الحديثة', shortDescription: 'من التوظيف إلى تطوير الموظفين', images: ['https://placehold.co/600x400/ef4444/ffffff?text=HR'], outline: [], prerequisites: [], duration: '35 ساعة', sessions: '12 جلسة', price: { original: 1400000, discounted: 1100000 }, offerEndDate: '2025-09-15' },
+                    { id: 'leadership', name: 'مهارات القيادة الفعالة', shortDescription: 'ألهم فريقك وحقق أفضل النتائج', images: ['https://placehold.co/600x400/f97316/ffffff?text=Leadership'], outline: [], prerequisites: [], duration: '25 ساعة', sessions: '8 جلسة', price: { original: 1200000, discounted: 900000 }, offerEndDate: '2025-08-30' },
+                    { id: 'marketing-mgmt', name: 'إدارة التسويق والمبيعات', shortDescription: 'ضع استراتيجيات ناجحة لزيادة الأرباح', images: ['https://placehold.co/600x400/10b981/ffffff?text=Sales'], outline: [], prerequisites: [], duration: '40 ساعة', sessions: '15 جلسة', price: { original: 1500000, discounted: 1200000 }, offerEndDate: '2025-09-20' },
+                    { id: 'finance', name: 'المالية لغير الماليين', shortDescription: 'افهم القوائم المالية واتخذ قرارات أفضل', images: ['https://placehold.co/600x400/3b82f6/ffffff?text=Finance'], outline: [], prerequisites: [], duration: '20 ساعة', sessions: '7 جلسة', price: { original: 1000000, discounted: 750000 }, offerEndDate: '2025-09-25' }
+                ]},
+                { id: 'languages', name: 'قسم اللغات', icon: LanguagesIcon, courses: [
+                    { id: 'eng-conv', name: 'محادثة إنجليزية - متوسط', shortDescription: 'تحدث الإنجليزية بثقة وطلاقة', images: ['https://placehold.co/600x400/4f46e5/ffffff?text=English'], outline: [], prerequisites: [], duration: '30 ساعة', sessions: '15 جلسة', price: { original: 800000, discounted: 600000 }, offerEndDate: '2025-08-10' },
+                    { id: 'german-a1', name: 'اللغة الألمانية - A1', shortDescription: 'ابدأ رحلتك مع اللغة الألمانية من الصفر', images: ['https://placehold.co/600x400/000000/ffffff?text=German'], outline: [], prerequisites: [], duration: '40 ساعة', sessions: '20 جلسة', price: { original: 1000000, discounted: 800000 }, offerEndDate: '2025-08-15' },
+                    { id: 'french-a1', name: 'اللغة الفرنسية - A1', shortDescription: 'تعلم أساسيات لغة الحب والثقافة', images: ['https://placehold.co/600x400/3b82f6/ffffff?text=French'], outline: [], prerequisites: [], duration: '40 ساعة', sessions: '20 جلسة', price: { original: 1000000, discounted: 800000 }, offerEndDate: '2025-08-20' },
+                    { id: 'turkish-a1', name: 'اللغة التركية - A1', shortDescription: 'خطوتك الأولى نحو إتقان اللغة التركية', images: ['https://placehold.co/600x400/ef4444/ffffff?text=Turkish'], outline: [], prerequisites: [], duration: '40 ساعة', sessions: '20 جلسة', price: { original: 1000000, discounted: 800000 }, offerEndDate: '2025-08-25' },
+                    { id: 'business-eng', name: 'لغة إنجليزية للأعمال', shortDescription: 'طور لغتك للتواصل في بيئة العمل', images: ['https://placehold.co/600x400/6b7280/ffffff?text=Business'], outline: [], prerequisites: [], duration: '35 ساعة', sessions: '12 جلسة', price: { original: 1200000, discounted: 950000 }, offerEndDate: '2025-09-01' }
+                ]},
+                { id: 'summer-club', name: 'النادي الصيفي', icon: SummerIcon, courses: [
+                    { id: 'scratch', name: 'البرمجة للأطفال (سكراتش)', shortDescription: 'برمجة الألعاب والقصص بطريقة ممتعة', images: ['https://placehold.co/600x400/f97316/ffffff?text=Scratch'], outline: [], prerequisites: [], duration: '20 ساعة', sessions: '10 جلسات', price: { original: 500000, discounted: 400000 }, offerEndDate: '2025-07-01' },
+                    { id: 'lego-robotics', name: 'روبوتات ليجو للأطفال', shortDescription: 'ابنِ وبرمج روبوتك الخاص', images: ['https://placehold.co/600x400/ef4444/ffffff?text=Lego'], outline: [], prerequisites: [], duration: '25 ساعة', sessions: '10 جلسة', price: { original: 700000, discounted: 550000 }, offerEndDate: '2025-07-05' },
+                    { id: 'drawing', name: 'الرسم والتلوين', shortDescription: 'أطلق العنان لإبداعك الفني', images: ['https://placehold.co/600x400/8b5cf6/ffffff?text=Drawing'], outline: [], prerequisites: [], duration: '15 ساعة', sessions: '10 جلسات', price: { original: 400000, discounted: 300000 }, offerEndDate: '2025-07-10' },
+                    { id: 'public-speaking', name: 'الخطابة والإلقاء للناشئين', shortDescription: 'عبر عن نفسك بثقة أمام الجمهور', images: ['https://placehold.co/600x400/06b6d4/ffffff?text=Speaking'], outline: [], prerequisites: [], duration: '15 ساعة', sessions: '8 جلسة', price: { original: 450000, discounted: 350000 }, offerEndDate: '2025-07-15' },
+                    { id: 'chess', name: 'الشطرنج والحساب الذهني', shortDescription: 'نمّي ذكاءك ومهاراتك الاستراتيجية', images: ['https://placehold.co/600x400/1e293b/ffffff?text=Chess'], outline: [], prerequisites: [], duration: '20 ساعة', sessions: '10 جلسة', price: { original: 500000, discounted: 400000 }, offerEndDate: '2025-07-20' }
+                ]}
             ] 
         };
 
@@ -67,27 +104,99 @@
         const SideMenuTemplate = () => `<div id="menu-overlay" class="fixed inset-0 bg-black/60 z-40 animate-fade-in ${state.isMenuOpen ? '' : 'hidden'}"></div><aside id="side-menu" class="fixed top-0 right-0 bottom-0 w-72 bg-slate-50 dark:bg-slate-800 shadow-2xl z-50 transform duration-300 ease-in-out ${state.isMenuOpen ? 'translate-x-0' : 'translate-x-full'}"><div class="p-4"><div class="flex justify-between items-center mb-6"><h2 class="text-lg font-bold text-slate-900 dark:text-white">الإعدادات</h2><button id="menu-close-btn" class="p-2 text-slate-600 dark:text-slate-400 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700" aria-label="إغلاق القائمة"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div><ul><li><button id="theme-toggle-btn" class="w-full flex items-center gap-4 p-3 rounded-lg text-lg text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700">${state.theme === 'dark' ? `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>` : `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`}<span>الوضع ${state.theme === 'dark' ? 'النهاري' : 'الليلي'}</span></button></li></ul></div></aside>`;
         const HomeScreenTemplate = () => `<div class="w-full max-w-5xl mx-auto p-4 md:p-6 bg-white dark:bg-slate-800 rounded-lg animate-fade-in shadow-xl"><h1 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-2 text-center">أقسامنا التدريبية</h1><p class="text-center text-slate-600 dark:text-slate-400 mb-8">اختر اهتمامك وانطلق</p><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">${educationalCenterData.categories.map(category => `<div data-category-id="${category.id}" class="category-card bg-slate-50 dark:bg-slate-700/50 p-6 rounded-lg text-center cursor-pointer flex flex-col items-center justify-center gap-4 hover:bg-blue-100 dark:hover:bg-slate-700 hover:shadow-xl hover:border-blue-500 dark:hover:border-sky-500 border-2 border-transparent transition-all duration-300 transform hover:-translate-y-2"><div class="text-blue-600 dark:text-sky-400">${category.icon}</div><h2 class="text-xl font-semibold text-slate-800 dark:text-white">${category.name}</h2></div>`).join('')}</div></div>`;
         const CoursesListTemplate = (category) => `<div class="w-full max-w-4xl mx-auto p-4 md:p-6 bg-white dark:bg-slate-800 rounded-lg animate-fade-in shadow-xl"><button id="back-to-home" class="mb-4 flex items-center gap-2 text-blue-600 dark:text-sky-500 hover:text-blue-700 dark:hover:text-sky-400 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>العودة للأقسام</button><h1 class="text-3xl font-bold text-slate-900 dark:text-white mb-6 text-center">دورات ${category.name}</h1>${category.courses.length > 0 ? `<div class="space-y-4">${category.courses.map(course => `<div data-course-id="${course.id}" class="course-card bg-slate-50 dark:bg-slate-700/50 p-4 rounded-lg flex justify-between items-center cursor-pointer hover:bg-blue-100 dark:hover:bg-slate-700 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"><div><h2 class="text-xl font-semibold text-blue-700 dark:text-sky-400">${course.name}</h2><p class="text-slate-600 dark:text-slate-400">${course.shortDescription}</p></div><svg class="text-slate-400 dark:text-slate-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></div>`).join('')}</div>` : `<p class="text-center text-slate-500 dark:text-slate-400 mt-8 text-lg">لا توجد دورات في هذا القسم حالياً.</p>`}</div>`;
+        
+        const CourseDetailsTemplate = (course) => {
+            const formatPrice = (price) => new Intl.NumberFormat('ar-SY').format(price);
+            return `
+            <div class="w-full max-w-4xl mx-auto p-4 md:p-6 bg-white dark:bg-slate-800 rounded-lg animate-fade-in shadow-xl">
+                <button id="back-to-courses" class="mb-4 flex items-center gap-2 text-blue-600 dark:text-sky-500 hover:text-blue-700 dark:hover:text-sky-400 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>العودة لقائمة الدورات
+                </button>
+                <h1 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4 text-center">${course.name}</h1>
+                
+                <div class="relative w-full max-w-2xl mx-auto mb-6 rounded-lg overflow-hidden shadow-lg">
+                    <img id="course-image" src="${course.images[state.currentImageIndex]}" alt="صورة عرض للدورة" class="w-full h-56 md:h-72 object-cover transition-all duration-300" />
+                    ${course.images.length > 1 ? `
+                        <button id="prev-image-btn" class="absolute top-1/2 left-2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-opacity">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                        </button>
+                        <button id="next-image-btn" class="absolute top-1/2 right-2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-opacity">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                        </button>
+                    ` : ''}
+                </div>
+
+                <div class="space-y-6">
+                    <div class="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-lg"><h2 class="text-2xl font-semibold text-blue-700 dark:text-sky-400 mb-3">ماذا ستتعلم؟</h2><ul class="space-y-2 pr-5 text-slate-700 dark:text-slate-300 list-disc list-inside">${course.outline.map(item => `<li>${item}</li>`).join('')}</ul></div>
+                    <div class="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-lg"><h2 class="text-2xl font-semibold text-blue-700 dark:text-sky-400 mb-3">لمن هذه الدورة؟</h2><ul class="space-y-2 pr-5 text-slate-700 dark:text-slate-300 list-disc list-inside">${course.prerequisites.map(item => `<li>${item}</li>`).join('')}</ul></div>
+                    <div class="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-lg text-center flex justify-around items-center"><div><p class="text-lg font-semibold text-slate-800 dark:text-white">المدة الإجمالية</p><p class="text-xl text-blue-600 dark:text-sky-400">${course.duration}</p></div><div class="border-l-2 border-gray-200 dark:border-slate-600 h-12"></div><div><p class="text-lg font-semibold text-slate-800 dark:text-white">عدد الجلسات</p><p class="text-xl text-blue-600 dark:text-sky-400">${course.sessions}</p></div></div>
+                    <div class="bg-blue-100 dark:bg-slate-700 p-5 rounded-lg text-center shadow-lg"><h2 class="text-2xl font-bold text-blue-800 dark:text-white mb-2">عرض خاص!</h2><div class="flex justify-center items-center gap-4 my-3"><span class="line-through text-slate-500 dark:text-slate-400 text-xl">${formatPrice(course.price.original)} ل.س</span><span class="text-3xl font-extrabold text-blue-600 dark:text-yellow-300 animate-pulse">${formatPrice(course.price.discounted)} ل.س فقط!</span></div><div class="mt-4 bg-white/50 dark:bg-slate-800/50 p-3 rounded-lg"><p class="mb-2 text-slate-700 dark:text-slate-200">ينتهي العرض بتاريخ: ${new Date(course.offerEndDate).toLocaleDateString('ar-SY')}</p></div></div>
+                    <div class="mt-8"><button id="whatsapp-register-btn" class="w-full flex items-center justify-center gap-3 bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-6 rounded-lg text-xl transition-transform transform hover:scale-105 shadow-lg"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99 0-3.903-.52-5.586-1.456l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.451-4.437-9.887-9.888-9.888-5.452 0-9.888 4.436-9.889 9.888.001 2.228.651 4.315 1.731 6.086l.001.004l-1.043 3.803 3.827-1.011z"/></svg>سجل الآن عبر الواتساب</button></div>
+                </div>
+            </div>`;
+        }
 
         // --- Render Function ---
         const render = () => {
             const appContainer = document.getElementById('app-container');
             let content = '';
-            if (state.page === 'home') { content = HomeScreenTemplate(); }
-            else if (state.page === 'courses') { const category = educationalCenterData.categories.find(c => c.id === state.selectedCategoryId); content = CoursesListTemplate(category); }
+
+            if (state.page === 'home') {
+                content = HomeScreenTemplate();
+            } else if (state.page === 'courses') {
+                const category = educationalCenterData.categories.find(c => c.id === state.selectedCategoryId);
+                content = CoursesListTemplate(category);
+            } else if (state.page === 'details') {
+                const category = educationalCenterData.categories.find(c => c.id === state.selectedCategoryId);
+                const course = category.courses.find(c => c.id === state.selectedCourseId);
+                content = CourseDetailsTemplate(course);
+            }
+            
             document.documentElement.className = state.theme;
             appContainer.innerHTML = `${HeaderTemplate()}${SideMenuTemplate()}<main class="pt-20 p-4 flex items-center justify-center min-h-screen">${content}</main>`;
             addEventListeners();
         };
-
+        
         // --- Event Listeners ---
         const addEventListeners = () => {
             document.getElementById('menu-toggle-btn')?.addEventListener('click', () => { state.isMenuOpen = true; render(); });
             document.getElementById('menu-close-btn')?.addEventListener('click', () => { state.isMenuOpen = false; render(); });
             document.getElementById('menu-overlay')?.addEventListener('click', () => { state.isMenuOpen = false; render(); });
             document.getElementById('theme-toggle-btn')?.addEventListener('click', () => { state.theme = state.theme === 'light' ? 'dark' : 'light'; localStorage.setItem('theme', state.theme); state.isMenuOpen = false; render(); });
-            document.querySelectorAll('.category-card').forEach(card => { card.addEventListener('click', () => { state.page = 'courses'; state.selectedCategoryId = card.dataset.categoryId; render(); }); });
-            document.querySelectorAll('.course-card').forEach(card => { card.addEventListener('click', () => { alert('صفحة تفاصيل الدورة قيد الإنشاء!'); }); });
+            
+            document.querySelectorAll('.category-card').forEach(card => card.addEventListener('click', () => { state.page = 'courses'; state.selectedCategoryId = card.dataset.categoryId; render(); }));
             document.getElementById('back-to-home')?.addEventListener('click', () => { state.page = 'home'; state.selectedCategoryId = null; render(); });
+            
+            document.querySelectorAll('.course-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    state.page = 'details';
+                    state.selectedCourseId = card.dataset.courseId;
+                    state.currentImageIndex = 0;
+                    render();
+                });
+            });
+            document.getElementById('back-to-courses')?.addEventListener('click', () => { state.page = 'courses'; state.selectedCourseId = null; render(); });
+            
+            if (state.page === 'details') {
+                const category = educationalCenterData.categories.find(c => c.id === state.selectedCategoryId);
+                const course = category.courses.find(c => c.id === state.selectedCourseId);
+                
+                const courseImage = document.getElementById('course-image');
+                document.getElementById('next-image-btn')?.addEventListener('click', () => {
+                    state.currentImageIndex = (state.currentImageIndex + 1) % course.images.length;
+                    courseImage.src = course.images[state.currentImageIndex];
+                });
+                document.getElementById('prev-image-btn')?.addEventListener('click', () => {
+                    state.currentImageIndex = (state.currentImageIndex - 1 + course.images.length) % course.images.length;
+                    courseImage.src = course.images[state.currentImageIndex];
+                });
+
+                document.getElementById('whatsapp-register-btn')?.addEventListener('click', () => {
+                    const phone = '963991015651'; 
+                    const msg = `مرحباً، أرغب بالاستفسار عن دورة "${course.name}". هل يمكنني الحصول على المزيد من التفاصيل؟`;
+                    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+                });
+            }
         };
 
         // --- Initial Render ---
