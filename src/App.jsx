@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 // --- المكونات المساعدة ---
 const Header = ({ onMenuToggle }) => (
   <header className="fixed top-0 right-0 left-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm shadow-md h-16 z-40 flex items-center justify-between px-4 transition-colors duration-300">
-    <h1 className="text-xl font-bold text-blue-700 dark:text-sky-400">المركز التعليمي</h1>
+    <h1 className="text-xl font-bold text-blue-700 dark:text-sky-400">مركز صلة التدريبي الدولي</h1>
     <button onClick={onMenuToggle} className="p-2 text-slate-800 dark:text-slate-200 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700" aria-label="فتح القائمة">
       <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
     </button>
