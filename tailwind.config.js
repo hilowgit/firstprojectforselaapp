@@ -1,13 +1,11 @@
-    /** @type {import('tailwindcss').Config} */
-    export default {
-      content: [
-        "./index.html",
-        "./src/**/*.{js,ts,jsx,tsx}",
-      ],
-      darkMode: 'class', // <--- هذا هو السطر الأهم
-      theme: {
-        extend: {},
-      },
-      plugins: [],
-    }
-    
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  darkMode: 'class', // السطر الأهم لتمكين التبديل اليدوي
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
