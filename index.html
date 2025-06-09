@@ -1,19 +1,213 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<html lang="ar" dir="rtl" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>المركز التعليمي</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
-    <meta name="theme-color" content="#14b8a6">
-    <link rel="manifest" href="/manifest.json">
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+    <style>
+        /* CSS for smooth animations and transitions */
+        .animate-fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-slide-in { animation: slideIn 0.3s ease-in-out; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        .hidden { display: none; }
+    </style>
+    <script>
+        // Tailwind CSS configuration
+        tailwind.config = {
+            darkMode: 'class', // This is the most important line
+            theme: {
+                extend: {
+                    colors: {
+                        sky: {
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                        },
+                        slate: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-['Cairo',_sans-serif] transition-colors duration-300">
+
+    <div id="app-container">
+        <!-- App content will be rendered here by JavaScript -->
+    </div>
+
+    <script type="module">
+        // --- State Management ---
+        const state = {
+            page: 'home', // 'home', 'courses', 'details'
+            selectedCategoryId: null,
+            selectedCourseId: null,
+            theme: localStorage.getItem('theme') || 'light',
+            isMenuOpen: false,
+        };
+
+        // --- Data ---
+        const TechIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>`;
+        const ManagementIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`;
+        const LanguagesIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>`;
+        const SummerIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`;
+        const educationalCenterData = { categories: [{ id: 'tech', name: 'القسم التقني', icon: TechIcon, courses: [{ id: 'web-dev', name: 'تطوير تطبيقات الويب الشاملة', shortDescription: 'من الصفر إلى بناء مشروعك الأول', images: ['https://placehold.co/600x400/3B82F6/ffffff?text=قاعة+التدريب','https://placehold.co/600x400/10B981/ffffff?text=مشاريع+الطلاب'], outline: ['مقدمة في HTML, CSS, و JavaScript','أساسيات React.js','بناء API','مشروع تطبيقي نهائي'], prerequisites: ['لا يشترط وجود خبرة برمجية سابقة.','الإلمام بأساسيات استخدام الحاسوب.'], duration: '60 ساعة', sessions: '20 جلسة', price: { original: 1500, discounted: 1125 }, offerEndDate: '2025-07-15' }] }, { id: 'management', name: 'قسم الإدارة والقيادة', icon: ManagementIcon, courses: [] }, { id: 'languages', name: 'قسم اللغات', icon: LanguagesIcon, courses: [] }, { id: 'summer-club', name: 'قسم النادي الصيفي', icon: SummerIcon, courses: [] }] };
+
+        // --- HTML Templates for each page ---
+        const HeaderTemplate = () => `
+            <header class="fixed top-0 right-0 left-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm shadow-md h-16 z-40 flex items-center justify-between px-4 transition-colors duration-300">
+                <h1 class="text-xl font-bold text-blue-700 dark:text-sky-400">المركز التعليمي</h1>
+                <button id="menu-toggle-btn" class="p-2 text-slate-800 dark:text-slate-200 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700" aria-label="فتح القائمة">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
+            </header>
+        `;
+
+        const SideMenuTemplate = () => `
+            <div id="menu-overlay" class="fixed inset-0 bg-black/60 z-40 animate-fade-in ${state.isMenuOpen ? '' : 'hidden'}"></div>
+            <aside id="side-menu" class="fixed top-0 right-0 bottom-0 w-72 bg-slate-50 dark:bg-slate-800 shadow-2xl z-50 transform duration-300 ease-in-out ${state.isMenuOpen ? 'translate-x-0' : 'translate-x-full'}">
+                <div class="p-4">
+                    <div class="flex justify-between items-center mb-6"><h2 class="text-lg font-bold text-slate-900 dark:text-white">الإعدادات</h2><button id="menu-close-btn" class="p-2 text-slate-600 dark:text-slate-400 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700" aria-label="إغلاق القائمة"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>
+                    <ul>
+                        <li>
+                            <button id="theme-toggle-btn" class="w-full flex items-center gap-4 p-3 rounded-lg text-lg text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700">
+                                ${state.theme === 'dark' ? `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>` : `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`}
+                                <span>الوضع ${state.theme === 'dark' ? 'النهاري' : 'الليلي'}</span>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </aside>
+        `;
+        
+        const HomeScreenTemplate = () => `
+            <div class="w-full max-w-5xl mx-auto p-4 md:p-6 bg-white dark:bg-slate-800 rounded-lg animate-fade-in shadow-xl">
+                <h1 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-2 text-center">أقسامنا التدريبية</h1>
+                <p class="text-center text-slate-600 dark:text-slate-400 mb-8">اختر اهتمامك وانطلق في رحلة التعلم</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    ${educationalCenterData.categories.map(category => `
+                        <div data-category-id="${category.id}" class="category-card bg-slate-50 dark:bg-slate-700/50 p-6 rounded-lg text-center cursor-pointer flex flex-col items-center justify-center gap-4 hover:bg-blue-100 dark:hover:bg-slate-700 hover:shadow-xl hover:border-blue-500 dark:hover:border-sky-500 border-2 border-transparent transition-all duration-300 transform hover:-translate-y-2">
+                            <div class="text-blue-600 dark:text-sky-400">${category.icon}</div>
+                            <h2 class="text-xl font-semibold text-slate-800 dark:text-white">${category.name}</h2>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        const CoursesListTemplate = (category) => `
+             <div class="w-full max-w-4xl mx-auto p-4 md:p-6 bg-white dark:bg-slate-800 rounded-lg animate-fade-in shadow-xl">
+                <button id="back-to-home" class="mb-4 flex items-center gap-2 text-blue-600 dark:text-sky-500 hover:text-blue-700 dark:hover:text-sky-400 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>العودة للأقسام
+                </button>
+                <h1 class="text-3xl font-bold text-slate-900 dark:text-white mb-6 text-center">دورات ${category.name}</h1>
+                ${category.courses.length > 0 ? `
+                    <div class="space-y-4">
+                        ${category.courses.map(course => `
+                            <div data-course-id="${course.id}" class="course-card bg-slate-50 dark:bg-slate-700/50 p-4 rounded-lg flex justify-between items-center cursor-pointer hover:bg-blue-100 dark:hover:bg-slate-700 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                                <div>
+                                    <h2 class="text-xl font-semibold text-blue-700 dark:text-sky-400">${course.name}</h2>
+                                    <p class="text-slate-600 dark:text-slate-400">${course.shortDescription}</p>
+                                </div>
+                                <svg class="text-slate-400 dark:text-slate-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : `<p class="text-center text-slate-500 dark:text-slate-400 mt-8 text-lg">لا توجد دورات في هذا القسم حالياً.</p>`}
+            </div>
+        `;
+        
+        // --- Render Function ---
+        const render = () => {
+            const appContainer = document.getElementById('app-container');
+            let content = '';
+
+            if (state.page === 'home') {
+                content = HomeScreenTemplate();
+            } else if (state.page === 'courses') {
+                const category = educationalCenterData.categories.find(c => c.id === state.selectedCategoryId);
+                content = CoursesListTemplate(category);
+            }
+            // Add CourseDetailsTemplate later if needed
+            
+            // Apply theme to the root element
+            document.documentElement.className = state.theme;
+
+            appContainer.innerHTML = `
+                ${HeaderTemplate()}
+                ${SideMenuTemplate()}
+                <main class="pt-20 p-4 flex items-center justify-center min-h-screen">
+                    ${content}
+                </main>
+            `;
+            addEventListeners();
+        };
+
+        // --- Event Listeners ---
+        const addEventListeners = () => {
+            // Menu
+            document.getElementById('menu-toggle-btn')?.addEventListener('click', () => {
+                state.isMenuOpen = true;
+                render();
+            });
+            document.getElementById('menu-close-btn')?.addEventListener('click', () => {
+                state.isMenuOpen = false;
+                render();
+            });
+            document.getElementById('menu-overlay')?.addEventListener('click', () => {
+                state.isMenuOpen = false;
+                render();
+            });
+            document.getElementById('theme-toggle-btn')?.addEventListener('click', () => {
+                state.theme = state.theme === 'light' ? 'dark' : 'light';
+                localStorage.setItem('theme', state.theme);
+                state.isMenuOpen = false; // close menu on theme change
+                render();
+            });
+
+            // Navigation
+            document.querySelectorAll('.category-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    state.page = 'courses';
+                    state.selectedCategoryId = card.dataset.categoryId;
+                    render();
+                });
+            });
+
+             document.querySelectorAll('.course-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    alert('صفحة تفاصيل الدورة قيد الإنشاء!');
+                    // state.page = 'details';
+                    // state.selectedCourseId = card.dataset.courseId;
+                    // render();
+                });
+            });
+
+            document.getElementById('back-to-home')?.addEventListener('click', () => {
+                state.page = 'home';
+                state.selectedCategoryId = null;
+                render();
+            });
+        };
+
+        // --- Initial Render ---
+        render();
+
+    </script>
+</body>
 </html>
