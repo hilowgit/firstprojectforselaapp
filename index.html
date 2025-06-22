@@ -172,7 +172,27 @@
 
         // --- CONFIGURATION ---
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'hero-health-journey-dev';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+       // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDZ7Ghq3QpWG4VRcM9m7dOdd07mSDDEhL4",
+  authDomain: "rayan-143e0.firebaseapp.com",
+  projectId: "rayan-143e0",
+  storageBucket: "rayan-143e0.firebasestorage.app",
+  messagingSenderId: "597904651157",
+  appId: "1:597904651157:web:3f6e907f145afb01bb3c9c",
+  measurementId: "G-7H19VBC3PS"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         // --- DOM ELEMENTS ---
