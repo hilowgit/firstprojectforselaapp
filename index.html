@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تطبيق  ريان رحلة البطل الصحي</title>
+    <title>تطبيق رحلة البطل الصحي</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -51,6 +51,12 @@
         }
         .quest-card.completed .quest-icon {
            color: #10B981; /* green-500 */
+        }
+        /* Style for the avatar image */
+        #avatar-img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover; /* Ensures the image covers the area nicely */
         }
     </style>
 </head>
@@ -223,7 +229,6 @@
 
             } catch (error) {
                 console.error("Initialization Error:", error);
-                // THIS IS THE FIX: Display a user-friendly error message with instructions
                 let friendlyMessage = '<p class="text-red-500 font-bold">حدث خطأ غير متوقع في تشغيل التطبيق. يرجى تحديث الصفحة.</p>';
                 if (error.code === 'auth/admin-restricted-operation') {
                     friendlyMessage = `
@@ -246,7 +251,7 @@
         }
         
         async function setupUser() {
-            const appId = 'hero-health-journey-prod'; // Using a consistent ID for production
+            const appId = 'hero-health-journey-prod';
             const docPath = `artifacts/${appId}/users/${userId}`;
             userDocRef = doc(db, docPath);
             const docSnap = await getDoc(userDocRef);
@@ -255,7 +260,7 @@
                 await setDoc(userDocRef, {
                     childName: "ريان",
                     stars: 0,
-                    avatar: "https://i.postimg.cc/wjdFPhtc/Health-Love.jpg",
+                    avatar: "https://i.postimg.cc/wjdFPhtc/Health-Love.jpg", // <-- UPDATED HERE
                     createdAt: new Date()
                 });
                 const today = new Date().toISOString().split('T')[0];
