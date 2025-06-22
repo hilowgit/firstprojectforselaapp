@@ -166,36 +166,29 @@
 
     <!-- Firebase and App Logic -->
     <script type="module">
+        // 1. Import functions from the SDKs
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, addDoc, query, getDocs, deleteDoc, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, addDoc, query, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- CONFIGURATION ---
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'hero-health-journey-dev';
-       // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+        // 2. Your web app's Firebase configuration
+        // THIS IS YOUR ACTUAL CONFIGURATION - KEEP IT
+        const firebaseConfig = {
+          apiKey: "AIzaSyDZ7Ghq3QpWG4VRcM9m7dOdd07mSDDEhL4",
+          authDomain: "rayan-143e0.firebaseapp.com",
+          projectId: "rayan-143e0",
+          storageBucket: "rayan-143e0.appspot.com",
+          messagingSenderId: "597904651157",
+          appId: "1:597904651157:web:3f6e907f145afb01bb3c9c",
+          measurementId: "G-7H19VBC3PS"
+        };
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyDZ7Ghq3QpWG4VRcM9m7dOdd07mSDDEhL4",
-  authDomain: "rayan-143e0.firebaseapp.com",
-  projectId: "rayan-143e0",
-  storageBucket: "rayan-143e0.firebasestorage.app",
-  messagingSenderId: "597904651157",
-  appId: "1:597904651157:web:3f6e907f145afb01bb3c9c",
-  measurementId: "G-7H19VBC3PS"
-};
+        // 3. Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        // --- DOM ELEMENTS ---
+        // --- DOM ELEMENTS (No changes here) ---
         const loadingSpinner = document.getElementById('loading-spinner');
         const appContainer = document.getElementById('app-container');
         const childViewBtn = document.getElementById('child-view-btn');
@@ -208,19 +201,16 @@ const analytics = getAnalytics(app);
         const goalForm = document.getElementById('goal-form');
         const familyGoalsList = document.getElementById('family-goals-list');
         
-        let db, auth, userId, userDocRef;
+        // --- APP STATE (No changes here) ---
+        let userId, userDocRef;
         let growthChartInstance = null;
         let starChartInstance = null;
-        let allQuestsData = []; // Cache for quest data
+        let allQuestsData = [];
         let currentStarChartPeriod = 'weekly';
 
-        // --- INITIALIZATION ---
+        // --- MAIN APP LOGIC (No changes here, just using the initialized services) ---
         async function main() {
             try {
-                const app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
                         userId = user.uid;
@@ -230,12 +220,8 @@ const analytics = getAnalytics(app);
                         appContainer.classList.remove('hidden');
                     }
                 });
-
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
+                // signInAnonymously is used for this public version
+                await signInAnonymously(auth);
 
             } catch (error) {
                 console.error("Initialization Error:", error);
@@ -244,6 +230,7 @@ const analytics = getAnalytics(app);
         }
         
         async function setupUser() {
+            const appId = 'hero-health-journey-prod'; // Using a consistent ID for production
             const docPath = `artifacts/${appId}/users/${userId}`;
             userDocRef = doc(db, docPath);
             const docSnap = await getDoc(userDocRef);
@@ -430,7 +417,6 @@ const analytics = getAnalytics(app);
             return { labels, data };
         }
         
-
         // --- FIRESTORE INTERACTIONS ---
         async function handleQuestClick(questId, completed, date) {
             const questDocRef = doc(db, `${userDocRef.path}/quests/${date}`);
