@@ -57,7 +57,7 @@
 <body class="bg-slate-50 text-slate-800">
 
     <!-- Loading Spinner -->
-    <div id="loading-spinner" class="fixed inset-0 bg-white/70 z-50 flex items-center justify-center backdrop-blur-sm">
+    <div id="loading-spinner" class="fixed inset-0 bg-white/70 z-50 flex items-center justify-center backdrop-blur-sm p-4">
         <div class="flex flex-col items-center">
             <svg class="animate-spin h-10 w-10 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -172,7 +172,6 @@
         import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, addDoc, query, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // 2. Your web app's Firebase configuration
-        // THIS IS YOUR ACTUAL CONFIGURATION - KEEP IT
         const firebaseConfig = {
           apiKey: "AIzaSyDZ7Ghq3QpWG4VRcM9m7dOdd07mSDDEhL4",
           authDomain: "rayan-143e0.firebaseapp.com",
@@ -188,7 +187,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- DOM ELEMENTS (No changes here) ---
+        // --- DOM ELEMENTS ---
         const loadingSpinner = document.getElementById('loading-spinner');
         const appContainer = document.getElementById('app-container');
         const childViewBtn = document.getElementById('child-view-btn');
@@ -201,14 +200,14 @@
         const goalForm = document.getElementById('goal-form');
         const familyGoalsList = document.getElementById('family-goals-list');
         
-        // --- APP STATE (No changes here) ---
+        // --- APP STATE ---
         let userId, userDocRef;
         let growthChartInstance = null;
         let starChartInstance = null;
         let allQuestsData = [];
         let currentStarChartPeriod = 'weekly';
 
-        // --- MAIN APP LOGIC (No changes here, just using the initialized services) ---
+        // --- MAIN APP LOGIC ---
         async function main() {
             try {
                 onAuthStateChanged(auth, async (user) => {
@@ -220,12 +219,29 @@
                         appContainer.classList.remove('hidden');
                     }
                 });
-                // signInAnonymously is used for this public version
                 await signInAnonymously(auth);
 
             } catch (error) {
                 console.error("Initialization Error:", error);
-                loadingSpinner.innerHTML = `<p class="text-red-500 font-bold">حدث خطأ في تشغيل التطبيق. يرجى تحديث الصفحة.</p>`;
+                // THIS IS THE FIX: Display a user-friendly error message with instructions
+                let friendlyMessage = '<p class="text-red-500 font-bold">حدث خطأ غير متوقع في تشغيل التطبيق. يرجى تحديث الصفحة.</p>';
+                if (error.code === 'auth/admin-restricted-operation') {
+                    friendlyMessage = `
+                        <div class="text-center p-4 bg-red-50 border border-red-200 rounded-lg max-w-lg">
+                            <h4 class="font-bold text-red-700 text-lg mb-2">خطأ في إعدادات Firebase</h4>
+                            <p class="text-red-600">يبدو أن طريقة تسجيل الدخول "المجهول" (Anonymous) غير مفعلة.</p>
+                            <p class="mt-4 text-sm text-slate-600">لحل المشكلة، يرجى اتباع الخطوات التالية في لوحة تحكم Firebase:</p>
+                            <ol class="text-right list-decimal list-inside mt-2 space-y-1 text-sm bg-slate-50 p-3 rounded-md">
+                                <li>اذهب إلى قسم <strong>Build > Authentication</strong>.</li>
+                                <li>اختر تبويب <strong>Sign-in method</strong>.</li>
+                                <li>ابحث عن <strong>Anonymous</strong> في القائمة واضغط عليها.</li>
+                                <li>قم بتفعيلها (Enable) ثم اضغط <strong>Save</strong>.</li>
+                            </ol>
+                            <p class="mt-4 text-xs text-slate-500">بعد تفعيلها، قم بتحديث هذه الصفحة.</p>
+                        </div>
+                    `;
+                }
+                loadingSpinner.innerHTML = friendlyMessage;
             }
         }
         
