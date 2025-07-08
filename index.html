@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>رحلة ريان البطل الصحي</title>
+    <title> رحلة ريان البطل الصحي</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,172 +16,168 @@
     <style>
         body {
             font-family: 'Cairo', sans-serif;
-            background-color: #F7FAFC;
         }
-        .hero-gradient {
-            background: linear-gradient(135deg, #4299E1 0%, #3182CE 100%);
+        .hero-bg {
+            background-color: #F0F9FF;
+            background-image: radial-gradient(#A5D8FF 1px, transparent 1px);
+            background-size: 20px 20px;
         }
         .rtl-icon { transform: scaleX(-1); }
         .hidden { display: none; }
+        .view-toggle-button, .period-toggle-button {
+            transition: all 0.3s ease;
+        }
         .view-toggle-button.active {
-            background-color: #ffffff;
-            color: #3182CE;
-            box-shadow: 0 4px 14px 0 rgb(0 0 0 / 10%);
+            background-color: #2563EB;
+            color: white;
+            box-shadow: 0 4px 14px 0 rgb(37 99 235 / 39%);
+        }
+        .period-toggle-button.active {
+            background-color: #16A34A; /* green-600 */
+            color: white;
         }
         .quest-card {
              transition: all 0.3s ease;
              cursor: pointer;
-             border: 2px solid transparent;
         }
         .quest-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px -5px rgb(0 0 0 / 10%);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         }
         .quest-card.completed {
-            border-color: #48BB78;
-            background-color: #F0FFF4;
+            background-color: #D1FAE5; /* green-100 */
+            border-color: #10B981; /* green-500 */
+            opacity: 0.8;
         }
-        .quest-card.completed .quest-icon-wrapper {
-            background-color: #48BB78;
-            color: white;
+        .quest-card.completed .quest-icon {
+           color: #10B981; /* green-500 */
         }
+        /* Style for the avatar image */
         #avatar-img {
-            width: 128px;
-            height: 128px;
-            object-fit: cover;
-            border: 6px solid white;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-        .progress-bar-bg {
-            background-color: #E2E8F0;
-        }
-        .progress-bar-fill {
-            background: linear-gradient(to left, #68D391, #48BB78);
-            transition: width 0.5s ease-in-out;
-        }
-        .stat-card {
-            background: rgba(255, 255, 255, 0.5);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        @keyframes fire-flicker {
-            0%, 100% { transform: scale(1) rotate(-1deg); opacity: 1; }
-            50% { transform: scale(1.05) rotate(1deg); opacity: 0.9; }
-        }
-        .streak-fire {
-            animation: fire-flicker 1.5s ease-in-out infinite;
+            width: 150px;
+            height: 150px;
+            object-fit: cover; /* Ensures the image covers the area nicely */
         }
     </style>
 </head>
-<body class="bg-gray-50 text-slate-800">
+<body class="bg-slate-50 text-slate-800">
 
     <!-- Loading Spinner -->
-    <div id="loading-spinner" class="fixed inset-0 bg-white/90 z-50 flex items-center justify-center backdrop-blur-sm p-4">
+    <div id="loading-spinner" class="fixed inset-0 bg-white/70 z-50 flex items-center justify-center backdrop-blur-sm p-4">
         <div class="flex flex-col items-center">
-            <svg class="animate-spin h-12 w-12 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <svg class="animate-spin h-10 w-10 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <p class="mt-4 text-lg font-bold text-blue-700">جاري تجهيز عالم الأبطال...</p>
+            <p class="mt-4 text-lg font-semibold text-blue-600">جاري تحميل عالم الأبطال...</p>
         </div>
     </div>
 
     <!-- Main Container -->
-    <div id="app-container" class="min-h-screen hidden">
+    <div id="app-container" class="container mx-auto p-4 md:p-8 hidden">
         
         <!-- Header & View Toggler -->
-        <header class="bg-white/80 backdrop-blur-sm sticky top-0 z-40 shadow-sm">
-            <div class="container mx-auto p-4 flex justify-between items-center">
-                <h1 class="text-2xl font-black text-blue-700">رحلة ريان البطل الصحي</h1>
-                <div class="p-1.5 bg-blue-100/50 rounded-full flex items-center space-x-2" dir="ltr">
-                    <button id="child-view-btn" class="view-toggle-button active font-bold py-2 px-5 rounded-full text-blue-600">
-                        <i data-lucide="rocket" class="inline-block mr-2 w-5 h-5"></i>
-                    </button>
-                    <button id="parent-view-btn" class="view-toggle-button font-bold py-2 px-5 rounded-full text-blue-600">
-                        <i data-lucide="user-check" class="inline-block mr-2 w-5 h-5"></i>
-                    </button>
-                </div>
+        <header class="flex flex-col md:flex-row justify-between items-center mb-8">
+            <h1 class="text-3xl font-black text-blue-800 mb-4 md:mb-0">رحلة ريان البطل الصحي</h1>
+            <div class="p-1.5 bg-slate-200 rounded-full flex items-center space-x-2" dir="ltr">
+                <button id="child-view-btn" class="view-toggle-button active font-bold py-2 px-6 rounded-full text-slate-700">
+                    <i data-lucide="rocket" class="inline-block mr-2"></i> عالم الأبطال
+                </button>
+                <button id="parent-view-btn" class="view-toggle-button font-bold py-2 px-6 rounded-full text-slate-700">
+                    <i data-lucide="user-check" class="inline-block mr-2"></i> مركز الدعم
+                </button>
             </div>
         </header>
 
         <!-- Child View -->
         <main id="child-view">
-            <!-- Hero Profile Section -->
-            <section class="hero-gradient text-white p-6 pt-10 pb-20">
-                <div class="text-center">
-                    <img src="https://i.postimg.cc/wjdFPhtc/Health-Love.jpg" id="avatar-img" class="mx-auto rounded-full" alt="صورة البطل">
-                    <h2 id="child-name" class="text-3xl font-black mt-4">ريان</h2>
-                    <p id="level-display" class="font-bold text-blue-200">المستوى 1</p>
-                </div>
-            </section>
-            
-            <!-- Stats & Progress Section -->
-            <section class="container mx-auto -mt-16 px-4">
-                <div class="grid grid-cols-2 gap-4 text-center">
-                    <div class="stat-card p-4 rounded-2xl shadow-lg">
-                        <h4 class="font-bold text-slate-500 text-sm">النجوم</h4>
-                        <div class="flex items-center justify-center gap-2 text-yellow-500 font-bold text-2xl mt-1">
-                            <i data-lucide="star" class="fill-current"></i>
-                            <span id="star-count">0</span>
-                        </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Profile & Rewards -->
+                <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-lg text-center">
+                    <img src="https://i.postimg.cc/wjdFPhtc/Health-Love.jpg" id="avatar-img" class="mx-auto rounded-full border-4 border-blue-500 shadow-md mb-4" alt="صورة البطل">
+                    <h2 id="child-name" class="text-2xl font-bold">ريان</h2>
+                    <div class="mt-4 flex items-center justify-center gap-2 bg-yellow-100 text-yellow-800 font-bold py-2 px-4 rounded-full text-xl">
+                        <i data-lucide="star" class="text-yellow-500 fill-current"></i>
+                        <span id="star-count">0</span>
+                        <span>نجمة</span>
                     </div>
-                     <div class="stat-card p-4 rounded-2xl shadow-lg">
-                        <h4 class="font-bold text-slate-500 text-sm">سلسلة الإنجاز</h4>
-                        <div id="streak-display" class="flex items-center justify-center gap-2 text-orange-500 font-bold text-2xl mt-1">
-                           <i data-lucide="flame" class="streak-fire"></i>
-                           <span>0</span>
-                        </div>
+                    <p class="text-sm text-slate-500 mt-2">أكمل المهام اليومية لجمع المزيد من النجوم!</p>
+                </div>
+
+                <!-- Daily Quests -->
+                <div class="lg:col-span-2">
+                    <h3 class="text-2xl font-bold mb-4">مهامك اليومية يا بطل!</h3>
+                     <p class="text-sm text-slate-500 mb-4">اضغط على المهمة لمعرفة المزيد من التفاصيل.</p>
+                    <div id="quests-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Quests will be dynamically inserted here -->
                     </div>
                 </div>
-                <!-- Daily Progress Bar -->
-                 <div class="mt-6 bg-white p-2 rounded-full shadow-lg">
-                     <h5 class="text-center font-bold text-sm mb-2 text-slate-600">تقدمك اليومي</h5>
-                     <div class="progress-bar-bg w-full rounded-full h-4 overflow-hidden">
-                        <div id="daily-progress-bar" class="progress-bar-fill h-full rounded-full" style="width: 0%;"></div>
-                     </div>
-                 </div>
-            </section>
-            
-            <!-- Daily Quests -->
-            <section class="container mx-auto p-4 mt-6">
-                 <h3 class="text-2xl font-bold mb-4 text-slate-700">مهامك اليومية يا بطل!</h3>
-                <div id="quests-container" class="grid grid-cols-1 gap-4">
-                    <!-- Quests will be dynamically inserted here -->
-                </div>
-            </section>
+            </div>
         </main>
 
-        <!-- Parent View (Kept functional but less styled for focus on child view) -->
-        <main id="parent-view" class="hidden p-4 md:p-8">
+        <!-- Parent View -->
+        <main id="parent-view" class="hidden">
              <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                <!-- Left Panel: Controls -->
                 <div class="lg:col-span-2 space-y-6">
                      <div class="bg-white p-6 rounded-2xl shadow-lg">
                         <h3 class="text-xl font-bold mb-4">تسجيل بيانات النمو</h3>
-                        <form id="growth-form" class="space-y-3"><input type="number" id="height-input" placeholder="الطول (سم)" class="w-full p-2 border rounded-md" required><input type="number" id="weight-input" placeholder="الوزن (كجم)" class="w-full p-2 border rounded-md" required><button type="submit" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-700 transition">حفظ</button></form>
+                        <p class="text-xs text-slate-500 mb-3">سجل البيانات بعد كل زيارة للطبيب. هذه المعلومات سرية لك فقط.</p>
+                        <form id="growth-form" class="space-y-3">
+                            <input type="number" id="height-input" placeholder="الطول (سم)" class="w-full p-2 border rounded-md" required>
+                            <input type="number" id="weight-input" placeholder="الوزن (كجم)" class="w-full p-2 border rounded-md" required>
+                            <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-700 transition">
+                                حفظ البيانات
+                            </button>
+                        </form>
                     </div>
+
                      <div class="bg-white p-6 rounded-2xl shadow-lg">
                         <h3 class="text-xl font-bold mb-4">الأهداف العائلية</h3>
-                        <ul id="family-goals-list" class="space-y-2 mb-3 text-sm"></ul>
-                        <form id="goal-form" class="flex gap-2"><input type="text" id="goal-input" placeholder="أضف هدفًا..." class="flex-grow p-2 border rounded-md text-sm"><button type="submit" class="bg-green-600 text-white p-2 rounded-md hover:bg-green-700 transition"><i data-lucide="plus"></i></button></form>
+                        <ul id="family-goals-list" class="space-y-2 mb-3 text-sm">
+                           <!-- Goals will be dynamically inserted here -->
+                        </ul>
+                        <form id="goal-form" class="flex gap-2">
+                            <input type="text" id="goal-input" placeholder="أضف هدفًا جديدًا..." class="flex-grow p-2 border rounded-md text-sm">
+                            <button type="submit" class="bg-green-600 text-white p-2 rounded-md hover:bg-green-700 transition">
+                                <i data-lucide="plus"></i>
+                            </button>
+                        </form>
                     </div>
                 </div>
+
+                <!-- Right Panel: Charts -->
                 <div class="lg:col-span-3 space-y-6">
-                    <div class="bg-white p-6 rounded-2xl shadow-lg"><h3 class="text-xl font-bold mb-4">مخطط نمو البطل</h3><div class="h-64"><canvas id="growthChart"></canvas></div></div>
-                    <div class="bg-white p-6 rounded-2xl shadow-lg"><div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4"><h3 class="text-xl font-bold mb-2 sm:mb-0">إحصائيات النجوم</h3><div class="p-1 bg-slate-100 rounded-full flex items-center text-sm space-x-1" dir="ltr"><button data-period="daily" class="period-toggle-button font-semibold py-1 px-3 rounded-full">يومي</button><button data-period="weekly" class="period-toggle-button active font-semibold py-1 px-3 rounded-full">أسبوعي</button><button data-period="monthly" class="period-toggle-button font-semibold py-1 px-3 rounded-full">شهري</button></div></div><div class="h-64"><canvas id="starChart"></canvas></div></div>
+                    <div class="bg-white p-6 rounded-2xl shadow-lg">
+                         <h3 class="text-xl font-bold mb-4">مخطط نمو البطل</h3>
+                         <p class="text-sm text-slate-500 mb-4">هذا المخطط للمتابعة فقط. <strong class="text-red-600">يجب دائمًا استشارة الطبيب المختص</strong> لتفسير بيانات نمو طفلك.</p>
+                         <div class="h-64"><canvas id="growthChart"></canvas></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-lg">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+                            <h3 class="text-xl font-bold mb-2 sm:mb-0">إحصائيات النجوم</h3>
+                            <div class="p-1 bg-slate-100 rounded-full flex items-center text-sm space-x-1" dir="ltr">
+                                <button data-period="daily" class="period-toggle-button font-semibold py-1 px-3 rounded-full">يومي</button>
+                                <button data-period="weekly" class="period-toggle-button active font-semibold py-1 px-3 rounded-full">أسبوعي</button>
+                                <button data-period="monthly" class="period-toggle-button font-semibold py-1 px-3 rounded-full">شهري</button>
+                            </div>
+                        </div>
+                         <div class="h-64"><canvas id="starChart"></canvas></div>
+                    </div>
                 </div>
              </div>
         </main>
+
     </div>
 
+    <!-- Firebase and App Logic -->
     <script type="module">
-        // Imports
+        // 1. Import functions from the SDKs
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        // *** THIS IS THE FIX FOR MOBILE ***
-        // We import `initializeAuth` and `indexedDBLocalPersistence` to ensure the user stays logged in.
-        import { initializeAuth, signInAnonymously, onAuthStateChanged, indexedDBLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, addDoc, query, deleteDoc, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, addDoc, query, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Config
+        // 2. Your web app's Firebase configuration
         const firebaseConfig = {
           apiKey: "AIzaSyDZ7Ghq3QpWG4VRcM9m7dOdd07mSDDEhL4",
           authDomain: "rayan-143e0.firebaseapp.com",
@@ -191,20 +187,13 @@
           appId: "1:597904651157:web:3f6e907f145afb01bb3c9c",
           measurementId: "G-7H19VBC3PS"
         };
-        
-        // Initialize Firebase App
-        const app = initializeApp(firebaseConfig);
-        
-        // *** THIS IS THE FIX FOR MOBILE ***
-        // Initialize Auth with local persistence to ensure the user stays logged in across sessions.
-        const auth = initializeAuth(app, {
-            persistence: indexedDBLocalPersistence
-        });
 
-        // Initialize Firestore
+        // 3. Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // DOM Elements
+        // --- DOM ELEMENTS ---
         const loadingSpinner = document.getElementById('loading-spinner');
         const appContainer = document.getElementById('app-container');
         const childViewBtn = document.getElementById('child-view-btn');
@@ -212,30 +201,17 @@
         const childView = document.getElementById('child-view');
         const parentView = document.getElementById('parent-view');
         const starCountEl = document.getElementById('star-count');
-        const levelDisplayEl = document.getElementById('level-display');
-        const streakDisplayEl = document.getElementById('streak-display').lastElementChild;
-        const dailyProgressBar = document.getElementById('daily-progress-bar');
         const questsContainer = document.getElementById('quests-container');
         const growthForm = document.getElementById('growth-form');
         const goalForm = document.getElementById('goal-form');
         const familyGoalsList = document.getElementById('family-goals-list');
         
-        // App State
+        // --- APP STATE ---
         let userId, userDocRef;
-        let growthChartInstance, starChartInstance;
+        let growthChartInstance = null;
+        let starChartInstance = null;
         let allQuestsData = [];
         let currentStarChartPeriod = 'weekly';
-        
-        // Constants
-        const QUESTS_CONFIG = [
-            { id: 'rainbow', title: 'مهمة قوس قزح', icon: 'carrot', color: 'orange'},
-            { id: 'water', title: 'تحدي الشلال', icon: 'glass-water', color: 'blue'},
-            { id: 'activity', title: 'تدريب الأبطال', icon: 'bike', color: 'green'},
-            { id: 'sleep', title: 'شحن الطاقة', icon: 'bed-double', color: 'indigo'},
-            { id: 'brave', title: 'المستكشف الشجاع', icon: 'gem', color: 'rose'},
-        ];
-        const STARS_PER_QUEST = 10;
-        const XP_PER_LEVEL = 100;
 
         // --- MAIN APP LOGIC ---
         async function main() {
@@ -247,45 +223,55 @@
                         attachListeners();
                         loadingSpinner.classList.add('hidden');
                         appContainer.classList.remove('hidden');
-                    } else {
-                        // If no user is found after checking, try to sign in.
-                         await signInAnonymously(auth);
                     }
                 });
+                await signInAnonymously(auth);
 
             } catch (error) {
-                console.error("Mobile Initialization Error:", error);
-                loadingSpinner.innerHTML = `<p class="text-red-500 font-bold text-center">حدث خطأ غير متوقع في تشغيل التطبيق. يرجى تحديث الصفحة.</p>`;
+                console.error("Initialization Error:", error);
+                let friendlyMessage = '<p class="text-red-500 font-bold">حدث خطأ غير متوقع في تشغيل التطبيق. يرجى تحديث الصفحة.</p>';
+                if (error.code === 'auth/admin-restricted-operation') {
+                    friendlyMessage = `
+                        <div class="text-center p-4 bg-red-50 border border-red-200 rounded-lg max-w-lg">
+                            <h4 class="font-bold text-red-700 text-lg mb-2">خطأ في إعدادات Firebase</h4>
+                            <p class="text-red-600">يبدو أن طريقة تسجيل الدخول "المجهول" (Anonymous) غير مفعلة.</p>
+                            <p class="mt-4 text-sm text-slate-600">لحل المشكلة، يرجى اتباع الخطوات التالية في لوحة تحكم Firebase:</p>
+                            <ol class="text-right list-decimal list-inside mt-2 space-y-1 text-sm bg-slate-50 p-3 rounded-md">
+                                <li>اذهب إلى قسم <strong>Build > Authentication</strong>.</li>
+                                <li>اختر تبويب <strong>Sign-in method</strong>.</li>
+                                <li>ابحث عن <strong>Anonymous</strong> في القائمة واضغط عليها.</li>
+                                <li>قم بتفعيلها (Enable) ثم اضغط <strong>Save</strong>.</li>
+                            </ol>
+                            <p class="mt-4 text-xs text-slate-500">بعد تفعيلها، قم بتحديث هذه الصفحة.</p>
+                        </div>
+                    `;
+                }
+                loadingSpinner.innerHTML = friendlyMessage;
             }
         }
         
         async function setupUser() {
-            if (!userId) return;
             const appId = 'hero-health-journey-prod';
             const docPath = `artifacts/${appId}/users/${userId}`;
             userDocRef = doc(db, docPath);
             const docSnap = await getDoc(userDocRef);
 
             if (!docSnap.exists()) {
-                const batch = writeBatch(db);
-                batch.set(userDocRef, {
+                await setDoc(userDocRef, {
                     childName: "ريان",
                     stars: 0,
-                    level: 1,
-                    streak: 0,
-                    lastQuestCompletionDate: null,
-                    avatar: "https://i.postimg.cc/wjdFPhtc/Health-Love.jpg",
+                    avatar: "https://i.postimg.cc/wjdFPhtc/Health-Love.jpg", // <-- UPDATED HERE
                     createdAt: new Date()
                 });
                 const today = new Date().toISOString().split('T')[0];
-                const questDocRef = doc(db, `${docPath}/quests/${today}`);
-                batch.set(questDocRef, getInitialQuests());
-                await batch.commit();
+                await setDoc(doc(db, `${docPath}/quests/${today}`), getInitialQuests());
+                await addDoc(collection(db, `${docPath}/familyGoals`), { text: "تناول وجبة العشاء معًا", createdAt: new Date() });
+                await addDoc(collection(db, `${docPath}/growthData`), { height: 140, weight: 55, date: new Date() });
             }
         }
         
         function getInitialQuests() {
-             return QUESTS_CONFIG.reduce((acc, quest) => ({...acc, [quest.id]: false}), {});
+             return { water: false, rainbow: false, activity: false, sleep: false, brave: false };
         }
         
         // --- UI & VIEW LOGIC ---
@@ -293,10 +279,13 @@
         parentViewBtn.addEventListener('click', () => toggleView('parent'));
 
         function toggleView(view) {
-            childView.classList.toggle('hidden', view !== 'child');
-            parentView.classList.toggle('hidden', view === 'child');
-            childViewBtn.classList.toggle('active', view === 'child');
-            parentViewBtn.classList.toggle('active', view !== 'child');
+            if (view === 'child') {
+                childView.classList.remove('hidden'); parentView.classList.add('hidden');
+                childViewBtn.classList.add('active'); parentViewBtn.classList.remove('active');
+            } else {
+                parentView.classList.remove('hidden'); childView.classList.add('hidden');
+                parentViewBtn.classList.add('active'); childViewBtn.classList.remove('active');
+            }
         }
 
         document.querySelectorAll('.period-toggle-button').forEach(button => {
@@ -307,130 +296,217 @@
                 renderStarChart();
             });
         });
-        
-        // --- New Gamification Logic ---
-        function calculateLevel(stars) {
-            return Math.floor(stars / XP_PER_LEVEL) + 1;
-        }
-
-        async function updateStreak(todayQuests) {
-            if (!userDocRef) return;
-            const allTodayCompleted = Object.values(todayQuests).every(Boolean);
-            const userData = (await getDoc(userDocRef)).data();
-            if (!userData) return;
-            let currentStreak = userData.streak || 0;
-            const lastCompletionDateStr = userData.lastQuestCompletionDate;
-
-            const todayStr = new Date().toISOString().split('T')[0];
-
-            if (allTodayCompleted) {
-                if (lastCompletionDateStr !== todayStr) {
-                    const yesterday = new Date();
-                    yesterday.setDate(yesterday.getDate() - 1);
-                    const yesterdayStr = yesterday.toISOString().split('T')[0];
-                    
-                    if (lastCompletionDateStr === yesterdayStr) {
-                        currentStreak++;
-                    } else {
-                        currentStreak = 1;
-                    }
-                    await updateDoc(userDocRef, { streak: currentStreak, lastQuestCompletionDate: todayStr });
-                }
-            } else {
-                if(lastCompletionDateStr) {
-                    const lastDate = new Date(lastCompletionDateStr);
-                    const today = new Date();
-                    const diffTime = Math.abs(today - lastDate);
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                    if(diffDays > 1) {
-                         await updateDoc(userDocRef, { streak: 0 });
-                    }
-                }
-            }
-        }
-
 
         // --- DATA RENDERING ---
-        function renderMainInfo(userData) {
-            document.getElementById('child-name').textContent = userData.childName;
-            document.getElementById('avatar-img').src = userData.avatar;
-            starCountEl.textContent = userData.stars || 0;
-            const newLevel = calculateLevel(userData.stars || 0);
-            levelDisplayEl.textContent = `المستوى ${newLevel}`;
-            streakDisplayEl.textContent = userData.streak || 0;
-        }
-
+        
+        const questDetails = {
+            rainbow: { title: 'مهمة قوس قزح 🌈', html: 'تناول <b>5 حصص متنوعة</b> من الفواكه والخضروات بألوان مختلفة خلال اليوم.<br><br><b>لماذا؟</b> كل لون يعطي جسمك فيتامينات ومعادن مختلفة. تخيل أنك تبني درعًا قويًا لجسمك!<br><br><b>كيف؟</b><ul class="list-disc pr-5 text-right mt-2"><li><b>الإفطار:</b> أضف شرائح موز أو توت إلى حبوب الإفطار.</li><li><b>الغداء:</b> طبق سلطة صغير مع خيار وطماطم وجزر.</li><li><b>وجبة خفيفة:</b> تفاحة أو برتقالة.</li><li><b>العشاء:</b> القليل من البروكلي أو البازلاء بجانب الطبق الرئيسي.</li></ul>' },
+            water: { title: 'تحدي الشلال 💧', html: 'اشرب <b>6 أكواب من الماء</b> على الأقل خلال اليوم.<br><br><b>لماذا؟</b> الماء هو وقود الدماغ والجسم، يساعدك على التركيز واللعب بنشاط.<br><br><b>كيف؟</b> لا تشربها دفعة واحدة! وزعها على اليوم:<ul class="list-disc pr-5 text-right mt-2"><li>كوب عند الاستيقاظ.</li><li>كوب مع كل وجبة رئيسية (إفطار، غداء، عشاء).</li><li>كوب قبل وبعد اللعب أو ممارسة الرياضة.</li><li>اجعل زجاجة الماء صديقتك الدائمة!</li></ul>' },
+            activity: { title: 'تدريب الأبطال 🏃‍♂️', html: 'مارس <b>60 دقيقة من الحركة واللعب</b> النشط.<br><br><b>لماذا؟</b> الحركة تقوي قلبك وعضلاتك وعظامك، وتجعلك تشعر بالسعادة.<br><br><b>كيف؟</b> ليس بالضرورة أن تكون رياضة رسمية! أي حركة تعتبر تدريبًا:<ul class="list-disc pr-5 text-right mt-2"><li>الجري في الحديقة أو اللعب بالكرة.</li><li>ركوب الدراجة أو السكوتر.</li><li>القفز على الحبل أو الرقص على أغانيك المفضلة.</li><li>مساعدة الأهل في أعمال المنزل التي تتطلب حركة.</li></ul>' },
+            sleep: { title: 'شحن الطاقة 😴', html: 'نم لمدة <b>9 إلى 11 ساعة</b> كل ليلة.<br><br><b>لماذا؟</b> أثناء النوم، يقوم جسمك بإصلاح نفسه وتنمو عضلاتك ويخزن دماغك ما تعلمته. إنه مثل شحن بطارية بطلك الخارق!<br><br><b>كيف؟</b><ul class="list-disc pr-5 text-right mt-2"><li>حدد موعدًا ثابتًا للنوم كل يوم.</li><li>ابتعد عن الشاشات (تلفزيون، تابلت) قبل ساعة من النوم.</li><li>اجعل غرفة نومك هادئة ومظلمة.</li></ul>' },
+            brave: { title: 'المستكشف الشجاع 🥑', html: 'جرب <b>طعامًا صحيًا جديدًا</b> لم تكن تعرفه.<br><br><b>لماذا؟</b> استكشاف أطعمة جديدة يوسع قائمة طعام القوة لديك، وقد تكتشف طعامك المفضل الجديد!<br><br><b>كيف؟</b><ul class="list-disc pr-5 text-right mt-2"><li>اطلب من الأهل اختيار نوع خضار أو فاكهة جديد عند التسوق.</li><li>جرب قضمة صغيرة فقط، لا بأس إذا لم تعجبك من أول مرة.</li><li>يمكنك مساعدة الأهل في تحضيرها لتشعر بالحماس لتجربتها.</li></ul>' },
+        };
+        
         function renderQuests(questsData, date) {
+            const quests = [
+                { id: 'rainbow', title: 'مهمة قوس قزح', icon: 'carrot', color: 'orange'},
+                { id: 'water', title: 'تحدي الشلال', icon: 'glass-water', color: 'blue'},
+                { id: 'activity', title: 'تدريب الأبطال', icon: 'bike', color: 'green'},
+                { id: 'sleep', title: 'شحن الطاقة', icon: 'bed-double', color: 'indigo'},
+                { id: 'brave', title: 'المستكشف الشجاع', icon: 'gem', color: 'rose'},
+            ];
             questsContainer.innerHTML = '';
-            let completedCount = 0;
-            QUESTS_CONFIG.forEach(quest => {
+            quests.forEach(quest => {
                 const isCompleted = questsData[quest.id];
-                if (isCompleted) completedCount++;
                 const card = document.createElement('div');
-                card.className = `quest-card bg-white rounded-2xl p-4 flex items-center gap-4 transition-all shadow-md ${isCompleted ? 'completed' : ''}`;
+                card.className = `quest-card border-2 rounded-2xl p-4 flex items-center gap-4 transition-all ${isCompleted ? 'completed' : 'bg-white'}`;
                 card.innerHTML = `
-                    <div class="quest-icon-wrapper w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 bg-${quest.color}-100 text-${quest.color}-600 transition-colors">
+                    <div class="quest-icon bg-${quest.color}-100 text-${quest.color}-600 w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0">
                         <i data-lucide="${quest.icon}" class="w-8 h-8"></i>
                     </div>
-                    <div><h4 class="font-bold text-lg text-slate-700">${quest.title}</h4></div>
+                    <div><h4 class="font-bold text-lg">${quest.title}</h4></div>
                 `;
-                card.onclick = () => handleQuestClick(quest.id, !isCompleted, date);
+                card.onclick = () => showQuestDetails(quest.id, isCompleted, date);
                 questsContainer.appendChild(card);
             });
-            const progress = (completedCount / QUESTS_CONFIG.length) * 100;
-            dailyProgressBar.style.width = `${progress}%`;
-            
-            updateStreak(questsData);
             lucide.createIcons();
         }
 
+        function showQuestDetails(questId, isCompleted, date) {
+            const details = questDetails[questId];
+            Swal.fire({
+                title: details.title,
+                html: details.html,
+                icon: 'info',
+                iconColor: '#3B82F6',
+                confirmButtonText: isCompleted ? 'إلغاء إنجاز المهمة' : 'لقد أنجزت المهمة!',
+                confirmButtonColor: isCompleted ? '#EF4444' : '#16A34A',
+                showCancelButton: true,
+                cancelButtonText: 'إغلاق',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    handleQuestClick(questId, !isCompleted, date);
+                }
+            });
+        }
+        
+        // --- Star Chart Logic ---
+        function renderStarChart() {
+            const ctx = document.getElementById('starChart').getContext('2d');
+            if (starChartInstance) starChartInstance.destroy();
+            
+            const { labels, data } = aggregateStarsByPeriod(allQuestsData, currentStarChartPeriod);
+
+            starChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'النجوم المكتسبة',
+                        data: data,
+                        backgroundColor: 'rgba(251, 191, 36, 0.6)',
+                        borderColor: 'rgba(251, 191, 36, 1)',
+                        borderWidth: 1,
+                        borderRadius: 5,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true, ticks: { stepSize: 10 } } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+        
+function aggregateStarsByPeriod(quests, period) {
+    const starsPerQuest = 10;
+    const dailyStars = {};
+    quests.forEach(q => {
+        const completedCount = Object.values(q.data).filter(Boolean).length;
+        dailyStars[q.id] = completedCount * starsPerQuest;
+    });
+
+    const today = new Date();
+    const labels = [];
+    const data = [];
+
+    if (period === 'daily') {
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(today.getDate() - i);
+            const dateString = d.toISOString().split('T')[0];
+            labels.push(d.toLocaleDateString('ar-EG', { weekday: 'short' }));
+            data.push(dailyStars[dateString] || 0);
+        }
+    } else if (period === 'weekly') {
+        for (let i = 3; i >= 0; i--) {
+            const weekEnd = new Date();
+            weekEnd.setDate(today.getDate() - (i * 7));
+            const weekStart = new Date(weekEnd);
+            weekStart.setDate(weekEnd.getDate() - 6);
+
+            const weekStartStr = weekStart.toISOString().split('T')[0];
+            const weekEndStr = weekEnd.toISOString().split('T')[0];
+            
+            labels.push(`الأسبوع ${4 - i}`);
+            let weekTotal = 0;
+            Object.keys(dailyStars).forEach(dateStr => {
+                if (dateStr >= weekStartStr && dateStr <= weekEndStr) {
+                    weekTotal += dailyStars[dateStr];
+                }
+            });
+            data.push(weekTotal);
+        }
+    } else if (period === 'monthly') {
+        for (let i = 5; i >= 0; i--) {
+            const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            
+            labels.push(d.toLocaleDateString('ar-EG', { month: 'long' }));
+            let monthTotal = 0;
+            Object.keys(dailyStars).forEach(dateStr => {
+                if (dateStr.startsWith(`${year}-${month}`)) {
+                    monthTotal += dailyStars[dateStr];
+                }
+            });
+            data.push(monthTotal);
+        }
+    }
+    return { labels, data };
+}
+        
         // --- FIRESTORE INTERACTIONS ---
         async function handleQuestClick(questId, completed, date) {
-            if (!userDocRef) return;
             const questDocRef = doc(db, `${userDocRef.path}/quests/${date}`);
-            await updateDoc(questDocRef, { [questId]: completed });
-            
-            const userData = (await getDoc(userDocRef)).data();
-            const currentStars = userData.stars || 0;
-            const currentLevel = calculateLevel(currentStars);
-            
-            const increment = completed ? STARS_PER_QUEST : -STARS_PER_QUEST;
-            const newStars = Math.max(0, currentStars + increment);
-            const newLevel = calculateLevel(newStars);
+            const increment = completed ? 10 : -10;
+            const docSnap = await getDoc(userDocRef);
+            const currentStars = docSnap.data().stars;
 
-            await updateDoc(userDocRef, { stars: newStars, level: newLevel });
+            await updateDoc(questDocRef, { [questId]: completed });
+            await updateDoc(userDocRef, { stars: Math.max(0, currentStars + increment) });
 
             if(completed) {
                  Swal.fire({
                     toast: true,
                     position: 'top-start',
                     icon: 'success',
-                    title: `رائع يا بطل! +${STARS_PER_QUEST} نجمة`,
+                    title: 'رائع يا بطل! +10 نجوم',
                     showConfirmButton: false,
-                    timer: 2000,
-                    showClass: { popup: 'swal2-noanimation', backdrop: 'swal2-noanimation' },
-                    hideClass: { popup: '', backdrop: '' }
+                    timer: 2000
                 });
-                if (newLevel > currentLevel) {
-                     Swal.fire({
-                        title: 'ارتقاء بالمستوى!',
-                        text: `لقد وصلت إلى المستوى ${newLevel}! استمر في التألق!`,
-                        icon: 'success',
-                        confirmButtonText: 'يا للروعة!'
-                    });
-                }
             }
+        }
+        
+        growthForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const height = document.getElementById('height-input').value;
+            const weight = document.getElementById('weight-input').value;
+            if (height && weight) {
+                await addDoc(collection(db, `${userDocRef.path}/growthData`), {
+                    height: parseFloat(height),
+                    weight: parseFloat(weight),
+                    date: new Date()
+                });
+                growthForm.reset();
+                 Swal.fire('تم الحفظ', 'تم حفظ بيانات النمو بنجاح.', 'success');
+            }
+        });
+
+        goalForm.addEventListener('submit', async(e) => {
+            e.preventDefault();
+            const goalInput = document.getElementById('goal-input');
+            const goalText = goalInput.value.trim();
+            if(goalText) {
+                await addDoc(collection(db, `${userDocRef.path}/familyGoals`), {
+                    text: goalText,
+                    createdAt: new Date()
+                });
+                goalInput.value = '';
+            }
+        });
+        
+        async function deleteFamilyGoal(goalId) {
+             await deleteDoc(doc(db, `${userDocRef.path}/familyGoals/${goalId}`));
         }
         
         // --- REALTIME LISTENERS ---
         let unsubscribes = [];
         function attachListeners() {
-            unsubscribes.forEach(unsub => unsub());
+            unsubscribes.forEach(unsub => unsub()); // Clear previous listeners
             unsubscribes = [];
 
+            // Listen to main user document
             const unsubUser = onSnapshot(userDocRef, (doc) => {
-                if (doc.exists()) renderMainInfo(doc.data());
+                const data = doc.data();
+                if (!data) return;
+                document.getElementById('child-name').textContent = data.childName;
+                document.getElementById('avatar-img').src = data.avatar;
+                starCountEl.textContent = data.stars;
             });
+
+            // Listen to today's quests
             const today = new Date().toISOString().split('T')[0];
             const questDocRef = doc(db, `${userDocRef.path}/quests/${today}`);
             const unsubTodayQuests = onSnapshot(questDocRef, async (docSnap) => {
@@ -440,33 +516,76 @@
                     await setDoc(questDocRef, getInitialQuests());
                 }
             });
+
+            // Listen to all quests for star chart
             const questsQuery = query(collection(db, `${userDocRef.path}/quests`));
             const unsubAllQuests = onSnapshot(questsQuery, (snapshot) => {
                 allQuestsData = snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }));
-                if(!parentView.classList.contains('hidden')) renderStarChart();
+                renderStarChart();
             });
+
+            // Re-use rendering functions for other listeners
             const growthQuery = query(collection(db, `${userDocRef.path}/growthData`));
-            const unsubGrowth = onSnapshot(growthQuery, (snapshot) => { if(!parentView.classList.contains('hidden')) renderGrowthChart(snapshot.docs.map(d => d.data()))});
+            const unsubGrowth = onSnapshot(growthQuery, (snapshot) => renderGrowthChart(snapshot.docs.map(d => d.data())));
+
             const goalsQuery = query(collection(db, `${userDocRef.path}/familyGoals`));
-            const unsubGoals = onSnapshot(goalsQuery, (snapshot) => { if(!parentView.classList.contains('hidden')) renderFamilyGoals(snapshot.docs.map(d => ({id: d.id, ...d.data()})))});
+            const unsubGoals = onSnapshot(goalsQuery, (snapshot) => renderFamilyGoals(snapshot.docs.map(d => ({id: d.id, ...d.data()}))));
 
             unsubscribes.push(unsubUser, unsubTodayQuests, unsubAllQuests, unsubGrowth, unsubGoals);
         }
 
-        // --- Parent view functions (unchanged logic, just for completeness)
-        function renderStarChart() { /* Logic is the same */ }
-        function renderGrowthChart(growthData) { /* Logic is the same */ }
-        function renderFamilyGoals(goals) { /* Logic is the same */ }
-        growthForm.addEventListener('submit', async (e) => { e.preventDefault(); const h = document.getElementById('height-input').value; const w = document.getElementById('weight-input').value; if(h&&w){await addDoc(collection(db, `${userDocRef.path}/growthData`), {height:parseFloat(h), weight:parseFloat(w), date: new Date()}); growthForm.reset();}});
-        goalForm.addEventListener('submit', async(e) => { e.preventDefault(); const i = document.getElementById('goal-input'); const t = i.value.trim(); if(t){await addDoc(collection(db, `${userDocRef.path}/familyGoals`), {text:t, createdAt: new Date()}); i.value='';}});
-        async function deleteFamilyGoal(goalId) { await deleteDoc(doc(db, `${userDocRef.path}/familyGoals/${goalId}`)); }
-        function aggregateStarsByPeriod(quests, period) { /* Logic is the same */ }
-        // To avoid re-pasting the same large functions
-        renderStarChart = function() { const ctx = document.getElementById('starChart')?.getContext('2d'); if(!ctx) return; if(starChartInstance) starChartInstance.destroy(); const {labels, data} = aggregateStarsByPeriod(allQuestsData, currentStarChartPeriod); starChartInstance = new Chart(ctx, {type:'bar', data: {labels, datasets:[{label:'النجوم المكتسبة', data, backgroundColor:'rgba(251, 191, 36, 0.6)', borderColor:'rgba(251, 191, 36, 1)', borderWidth:1, borderRadius:5}]}, options:{responsive:true, maintainAspectRatio:false, scales:{y:{beginAtZero:true, ticks:{stepSize:10}}}, plugins:{legend:{display:false}}}});};
-        aggregateStarsByPeriod = function(quests, period) { const dailyStars = {}; quests.forEach(q => { const completedCount = Object.values(q.data).filter(Boolean).length; dailyStars[q.id] = completedCount * STARS_PER_QUEST; }); const today = new Date(); const labels = []; const data = []; if (period === 'daily') { for (let i = 6; i >= 0; i--) { const d = new Date(today); d.setDate(d.getDate() - i); const dateString = d.toISOString().split('T')[0]; labels.push(d.toLocaleDateString('ar-EG', { weekday: 'short' })); data.push(dailyStars[dateString] || 0); } } else if (period === 'weekly') { for (let i = 3; i >= 0; i--) { const weekEnd = new Date(today); weekEnd.setDate(weekEnd.getDate() - (i * 7)); const weekStart = new Date(weekEnd); weekStart.setDate(weekStart.getDate() - 6); labels.push(`أسبوع ${4-i}`); let weekTotal = 0; Object.keys(dailyStars).forEach(dateStr => { const d = new Date(dateStr); d.setHours(0,0,0,0); const start = new Date(weekStart); start.setHours(0,0,0,0); const end = new Date(weekEnd); end.setHours(0,0,0,0); if (d >= start && d <= end) { weekTotal += dailyStars[dateStr]; }}); data.push(weekTotal); } } else if (period === 'monthly') { for (let i = 5; i >= 0; i--) { const d = new Date(today.getFullYear(), today.getMonth() - i, 1); labels.push(d.toLocaleDateString('ar-EG', { month: 'long' })); let monthTotal = 0; Object.keys(dailyStars).forEach(dateStr => { if (dateStr.startsWith(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`)) { monthTotal += dailyStars[dateStr]; }}); data.push(monthTotal); } } return {labels, data}; };
-        renderGrowthChart = function(growthData) { const ctx = document.getElementById('growthChart')?.getContext('2d'); if(!ctx) return; const sortedData = growthData.sort((a,b) => a.date.seconds - b.date.seconds); const labels = sortedData.map(d => new Date(d.date.seconds * 1000).toLocaleDateString('ar-EG')); const weightData = sortedData.map(d => d.weight); const heightData = sortedData.map(d => d.height); if(growthChartInstance) growthChartInstance.destroy(); growthChartInstance = new Chart(ctx, {type:'line', data:{labels, datasets: [{label:'الوزن (كجم)', data:weightData, borderColor:'rgb(59, 130, 246)', yAxisID:'y'}, {label:'الطول (سم)', data:heightData, borderColor:'rgb(234, 88, 12)', yAxisID:'y1'}]}, options:{responsive:true, maintainAspectRatio:false, scales:{y:{position:'right', title:{display:true, text:'الوزن (كجم)'}}, y1:{position:'left', title:{display:true, text:'الطول (سم)'}, grid:{drawOnChartArea:false}}}}}); };
-        renderFamilyGoals = function(goals) { if(!familyGoalsList) return; familyGoalsList.innerHTML = ''; if (goals.length === 0) { familyGoalsList.innerHTML = `<li class="text-slate-500">لا توجد أهداف حالية.</li>`; return; } goals.forEach(goal => { const li = document.createElement('li'); li.className = 'flex items-center justify-between bg-white p-2 rounded-md shadow-sm'; li.innerHTML = `<span>${goal.text}</span><button data-id="${goal.id}" class="delete-goal-btn text-red-500 hover:text-red-700"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`; familyGoalsList.appendChild(li); }); document.querySelectorAll('.delete-goal-btn').forEach(btn => {btn.onclick = (e) => deleteFamilyGoal(e.currentTarget.getAttribute('data-id'));}); lucide.createIcons();};
+        function renderGrowthChart(growthData) {
+            const ctx = document.getElementById('growthChart').getContext('2d');
+            const sortedData = growthData.sort((a,b) => a.date.seconds - b.date.seconds);
+            const labels = sortedData.map(d => new Date(d.date.seconds * 1000).toLocaleDateString('ar-EG'));
+            const weightData = sortedData.map(d => d.weight);
+            const heightData = sortedData.map(d => d.height);
+            
+            if(growthChartInstance) growthChartInstance.destroy();
+
+            growthChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'الوزن (كجم)', data: weightData, borderColor: 'rgb(59, 130, 246)', yAxisID: 'y' },
+                        { label: 'الطول (سم)', data: heightData, borderColor: 'rgb(234, 88, 12)', yAxisID: 'y1' }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        y: { position: 'right', title: { display: true, text: 'الوزن (كجم)' } },
+                        y1: { position: 'left', title: { display: true, text: 'الطول (سم)' }, grid: { drawOnChartArea: false } }
+                    }
+                }
+            });
+        }
         
+        function renderFamilyGoals(goals) {
+            familyGoalsList.innerHTML = '';
+            if (goals.length === 0) {
+                familyGoalsList.innerHTML = `<li class="text-slate-500">لا توجد أهداف حالية.</li>`;
+                return;
+            }
+            goals.forEach(goal => {
+                const li = document.createElement('li');
+                li.className = 'flex items-center justify-between bg-white p-2 rounded-md shadow-sm';
+                li.innerHTML = `
+                    <span>${goal.text}</span>
+                    <button data-id="${goal.id}" class="delete-goal-btn text-red-500 hover:text-red-700">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                `;
+                familyGoalsList.appendChild(li);
+            });
+            document.querySelectorAll('.delete-goal-btn').forEach(btn => {
+                btn.onclick = (e) => deleteFamilyGoal(e.currentTarget.getAttribute('data-id'));
+            });
+            lucide.createIcons();
+        }
+
+        // --- START THE APP ---
         main();
 
     </script>
