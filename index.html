@@ -379,64 +379,63 @@
             });
         }
         
-        function aggregateStarsByPeriod(quests, period) {
-            const starsPerQuest = 10;
-            const dailyStars = {};
-            quests.forEach(q => {
-                const completedCount = Object.values(q.data).filter(Boolean).length;
-                dailyStars[q.id] = completedCount * starsPerQuest;
-            });
+function aggregateStarsByPeriod(quests, period) {
+    const starsPerQuest = 10;
+    const dailyStars = {};
+    quests.forEach(q => {
+        const completedCount = Object.values(q.data).filter(Boolean).length;
+        dailyStars[q.id] = completedCount * starsPerQuest;
+    });
 
-            const today = new Date();
-            const labels = [];
-            const data = [];
-            
-            if (period === 'daily') {
-                for (let i = 6; i >= 0; i--) {
-                    const d = new Date(today);
-                    d.setDate(d.getDate() - i);
-                    const dateString = d.toISOString().split('T')[0];
-                    labels.push(d.toLocaleDateString('ar-EG', { weekday: 'short' }));
-                    data.push(dailyStars[dateString] || 0);
-                }
-            } else if (period === 'weekly') {
-                for (let i = 3; i >= 0; i--) {
-                    const weekEnd = new Date(today);
-                    weekEnd.setDate(weekEnd.getDate() - (i * 7));
-                    const weekStart = new Date(weekEnd);
-                    weekStart.setDate(weekStart.getDate() - 6);
-                    
-                    labels.push(`أسبوع ${4-i}`);
-                    let weekTotal = 0;
-                    Object.keys(dailyStars).forEach(dateStr => {
-                        const d = new Date(dateStr);
-                        d.setHours(0,0,0,0);
-                        const start = new Date(weekStart);
-                        start.setHours(0,0,0,0);
-                         const end = new Date(weekEnd);
-                        end.setHours(0,0,0,0);
+    const today = new Date();
+    const labels = [];
+    const data = [];
 
-                        if (d >= start && d <= end) {
-                            weekTotal += dailyStars[dateStr];
-                        }
-                    });
-                    data.push(weekTotal);
-                }
-            } else if (period === 'monthly') {
-                 for (let i = 5; i >= 0; i--) {
-                    const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
-                    labels.push(d.toLocaleDateString('ar-EG', { month: 'long' }));
-                    let monthTotal = 0;
-                     Object.keys(dailyStars).forEach(dateStr => {
-                        if (dateStr.startsWith(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`)) {
-                           monthTotal += dailyStars[dateStr];
-                        }
-                    });
-                    data.push(monthTotal);
-                }
-            }
-            return { labels, data };
+    if (period === 'daily') {
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(today.getDate() - i);
+            const dateString = d.toISOString().split('T')[0];
+            labels.push(d.toLocaleDateString('ar-EG', { weekday: 'short' }));
+            data.push(dailyStars[dateString] || 0);
         }
+    } else if (period === 'weekly') {
+        for (let i = 3; i >= 0; i--) {
+            const weekEnd = new Date();
+            weekEnd.setDate(today.getDate() - (i * 7));
+            const weekStart = new Date(weekEnd);
+            weekStart.setDate(weekEnd.getDate() - 6);
+
+            const weekStartStr = weekStart.toISOString().split('T')[0];
+            const weekEndStr = weekEnd.toISOString().split('T')[0];
+            
+            labels.push(`الأسبوع ${4 - i}`);
+            let weekTotal = 0;
+            Object.keys(dailyStars).forEach(dateStr => {
+                if (dateStr >= weekStartStr && dateStr <= weekEndStr) {
+                    weekTotal += dailyStars[dateStr];
+                }
+            });
+            data.push(weekTotal);
+        }
+    } else if (period === 'monthly') {
+        for (let i = 5; i >= 0; i--) {
+            const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            
+            labels.push(d.toLocaleDateString('ar-EG', { month: 'long' }));
+            let monthTotal = 0;
+            Object.keys(dailyStars).forEach(dateStr => {
+                if (dateStr.startsWith(`${year}-${month}`)) {
+                    monthTotal += dailyStars[dateStr];
+                }
+            });
+            data.push(monthTotal);
+        }
+    }
+    return { labels, data };
+}
         
         // --- FIRESTORE INTERACTIONS ---
         async function handleQuestClick(questId, completed, date) {
